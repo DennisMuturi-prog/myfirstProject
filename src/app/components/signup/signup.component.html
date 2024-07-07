@@ -1,0 +1,174 @@
+ <form
+      [formGroup]="signupForm"
+      (ngSubmit)="signupForm.valid ? onReactiveSubmit() : openErrorSnackBar()"
+    >
+      <div>
+        <mat-form-field>
+          <mat-label>First Name</mat-label>
+          <input matInput type="text" formControlName="firstName" />
+          <mat-hint>Enter your first name</mat-hint>
+          @if(firstName?.invalid&&(firstName?.touched)){
+          @if(firstName?.hasError('required')){
+          <mat-error>First name is required</mat-error>
+          } }
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Second Name</mat-label>
+          <input matInput type="text" formControlName="secondName" />
+          <mat-hint>Enter your second name</mat-hint>
+          @if(secondName?.invalid&&(secondName?.touched)){
+          @if(secondName?.hasError('required')){
+          <mat-error>Second name is required</mat-error>
+          } }
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          <mat-hint>Enter your email address</mat-hint>
+          @if(email?.invalid&&(email?.dirty|| email?.touched)){
+          @if(email?.hasError('required')){
+          <mat-error>Email is required</mat-error>
+          } @if(email?.hasError('email')){
+          <mat-error>Enter a valid email.eg.example&#64;example.com</mat-error>
+          } }
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+          />
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="clickPasswordHideEvent($event)"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword()"
+          >
+            <mat-icon>{{
+              hidePassword() ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+          <mat-hint align="start">input strong password</mat-hint>
+          <mat-hint align="end">{{ password?.value?.length }}/8</mat-hint>
+          @if(password?.invalid&&(password?.dirty || password?.touched)){
+          @if(password?.hasError('required')){
+          <mat-error>Password is required</mat-error>
+          } @if(password?.hasError('pattern')){
+          <mat-error
+            >Password must have an uppercase character,lowercase Character,a
+            number,a special character and must be longer than 8
+            characters</mat-error
+          >
+          } }
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field>
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="confirmPassword"
+          />
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="clickPasswordHideEvent($event)"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword()"
+          >
+            <mat-icon>{{
+              hidePassword() ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+          <mat-hint>Repeat password</mat-hint>
+          @if(confirmPassword?.invalid&&(confirmPassword?.dirty ||
+          confirmPassword?.touched)){
+          @if(confirmPassword?.hasError('required')){
+          <mat-error>Confirm Password is required</mat-error>
+          } @if(confirmPassword?.hasError('passwordMismatch')){
+          <mat-error>Input matching passwords</mat-error>
+          } }
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Date of birth</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="dateOfBirth"
+          />
+          <mat-hint>MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if(dateOfBirth?.invalid&&(dateOfBirth?.touched)){
+          @if(dateOfBirth?.hasError('required')){
+          <mat-error>Date of birth is required</mat-error>
+          } }
+        </mat-form-field>
+      </div>
+      <div class="genderDiv">
+        <mat-label>Gender</mat-label>
+        <mat-radio-group
+          aria-label="Select your gender"
+          formControlName="gender"
+        >
+          <mat-radio-button value="Male">Male</mat-radio-button>
+          <mat-radio-button value="Female">Female</mat-radio-button>
+          <mat-radio-button value="Non-binary"
+            >Prefer not to say</mat-radio-button
+          >
+        </mat-radio-group>
+        @if(gender?.invalid&&(gender?.touched)){
+        @if(gender?.hasError('required')){
+        <mat-error>Your gender is required</mat-error>
+        } }
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Platforms/People</mat-label>
+          <mat-select formControlName="marketingSource">
+            <mat-option value="twitter">Twitter</mat-option>
+            <mat-option value="facebook">Facebook</mat-option>
+            <mat-option value="whatsapp">WhatsApp</mat-option>
+            <mat-option value="tiktok">Tiktok</mat-option>
+            <mat-option value="instagram">Instagram</mat-option>
+            <mat-option value="friends">Friends</mat-option>
+          </mat-select>
+          <mat-hint>Where did you hear us from?</mat-hint>
+          @if(marketingSource?.invalid&&(marketingSource?.touched)){
+          @if(marketingSource?.hasError('required')){
+          <mat-error>Marketing source is required</mat-error>
+          } }
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-checkbox formControlName="acceptTerms"
+          >Accept the terms and conditions of our site.</mat-checkbox
+        >
+        <mat-hint>Read our privacy policy and accept</mat-hint>
+        @if(acceptTerms?.invalid&&(acceptTerms?.touched)){
+        @if(acceptTerms?.hasError('required')){
+        <mat-error>You must agree to the terms and conditions</mat-error>
+        } }
+      </div>
+      <button mat-flat-button type="submit">Sign Up</button>
+    </form>

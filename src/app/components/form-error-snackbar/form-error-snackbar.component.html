@@ -1,0 +1,12 @@
+<span matSnackBarLabel class="signupError">
+  You have not filled in some fields.
+</span>
+<span matSnackBarActions>
+  <button
+    mat-button
+    matSnackBarAction
+    (click)="snackBarRef.dismissWithAction()"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</span>

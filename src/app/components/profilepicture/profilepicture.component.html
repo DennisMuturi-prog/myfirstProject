@@ -1,0 +1,28 @@
+<mat-toolbar>
+  <h1>Profile Picture</h1>
+</mat-toolbar>
+<div>
+  <div class="imgContainer">
+    <img
+      [src]="croppedImage() ? croppedImage() : 'https://placehold.co/300'"
+      alt=""
+      width="300px"
+      height="300px"
+    />
+  </div>
+  <div>
+    <input
+      #fileinput
+      type="file"
+      (change)="openDialog($event)"
+      (click)="fileinput.value = ''"
+      hidden
+    />
+    <button mat-flat-button (click)="fileinput.click()">
+      Choose Profile Pic
+    </button>
+    @if(croppedImage()){
+    <button mat-raised-button>Upload profile pic</button>
+    }
+  </div>
+</div>
