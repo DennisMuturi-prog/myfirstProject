@@ -1,0 +1,10 @@
+<p>home works!</p>
+<div *ngIf="currentUser$ |async as user">
+    <p>{{user.email}}</p>
+    <p>{{user.userId}}</p>
+    <p>{{user.userName}}</p>
+</div>
+
+
+<button mat-flat-button
+(click)="logout()" >Log out</button>

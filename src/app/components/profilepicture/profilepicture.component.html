@@ -1,6 +1,10 @@
 <mat-toolbar>
   <h1>Profile Picture</h1>
 </mat-toolbar>
+@if(selectedImage()){
+  <mat-progress-bar mode="determinate" [value]="progressbarPercent()"></mat-progress-bar>
+}
+
 <div>
   <div class="imgContainer">
     <img
@@ -22,7 +26,8 @@
       Choose Profile Pic
     </button>
     @if(croppedImage()){
-    <button mat-raised-button>Upload profile pic</button>
+    <button (click)="uploadProfilePhoto()"
+    mat-raised-button>Upload profile pic</button>
     }
   </div>
 </div>

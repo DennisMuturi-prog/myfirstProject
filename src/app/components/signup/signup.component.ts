@@ -1,5 +1,15 @@
-import { ChangeDetectionStrategy, Component,inject,signal } from '@angular/core';
-import { ReactiveFormsModule,FormGroup,FormControl,Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  Validators,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +19,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-import { RouterLink ,Router} from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { confirmPasswordValidator } from './confirm-password.validator';
 import { AuthService } from '../../services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -19,22 +29,26 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 @Component({
   selector: 'app-signup',
   standalone: true,
-  providers:[provideNativeDateAdapter()],
-  imports: [ReactiveFormsModule,MatCardModule,MatButtonModule,MatIconModule,
+  providers: [provideNativeDateAdapter()],
+  imports: [
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
     MatFormFieldModule,
     MatRadioModule,
     MatCheckboxModule,
     MatSelectModule,
     MatDatepickerModule,
     MatInputModule,
-    RouterLink
+    RouterLink,
   ],
-  changeDetection:ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
+  styleUrl: './signup.component.css',
 })
 export class SignupComponent {
-   StrongPasswordRegx: RegExp =
+  StrongPasswordRegx: RegExp =
     /^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=\D*\d).{8,}$/;
   signupForm = new FormGroup(
     {
@@ -80,7 +94,7 @@ export class SignupComponent {
   get acceptTerms() {
     return this.signupForm.get('acceptTerms');
   }
-  _snackBar=inject(MatSnackBar)
+  _snackBar = inject(MatSnackBar);
   authService = inject(AuthService);
   router = inject(Router);
   hidePassword = signal(true);
@@ -89,17 +103,38 @@ export class SignupComponent {
     event.stopPropagation();
   }
   onSubmit() {
-    this.authService.register(this.signupForm.value).subscribe(() => {
-      this.router.navigate(['/home']);
+    const {
+      firstName,
+      secondName,
+      email,
+      password,
+      dateOfBirth,
+      gender,
+      marketingSource,
+    } = this.signupForm.value;
+    if(firstName&&secondName&&email&&password&&dateOfBirth&&gender&&marketingSource){
+      const registeredUser = {
+      firstName,
+      secondName,
+      email,
+      password,
+      dateOfBirth,
+      gender,
+      marketingSource,
+    };
+    this.authService.register(registeredUser).subscribe(() => {
+      this.router.navigate(['/profilepic']);
+    });
+
+    }
+    
+  }
+  openErrorSnackBar() {
+    this._snackBar.openFromComponent(FormErrorSnackbarComponent, {
+      duration: 5000,
     });
   }
-  openErrorSnackBar(){
-    this._snackBar.openFromComponent(FormErrorSnackbarComponent,{
-      duration:5000
-    })
+  onReactiveSubmit() {
+    console.log(this.signupForm.value);
   }
-  onReactiveSubmit(){
-    console.log(this.signupForm.value)
-  }
-
 }
