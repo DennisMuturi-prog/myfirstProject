@@ -14,8 +14,18 @@
     <mat-sidenav #sidenav><app-side-nav></app-side-nav></mat-sidenav>
     <mat-sidenav-content>
         <div class="allProducts">
-            @for(product of products$ | async ;track product.pid){
-                <app-product [product]="product"/>
+            @if(products$ | async; as products){
+                @if(products.length>=1){
+                    @for(product of products;track product.pid){
+                        <app-product [product]="product"/>
+                    }
+                }
+                @else{
+                    <p>No such items exist with the filters provided</p>
+                }
+            }
+            @else {
+                <mat-spinner></mat-spinner>
             }
         </div>
     </mat-sidenav-content>
