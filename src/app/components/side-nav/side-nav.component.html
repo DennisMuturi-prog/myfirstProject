@@ -1,9 +1,13 @@
 <form class="priceSlider">
   <mat-slider min="1" max="1500" discrete="">
-    <input value="1" matSliderStartThumb />
-    <input value="1500" matSliderEndThumb />
+    <input value="1" matSliderStartThumb
+    [formControl]="priceLowerControl" />
+    <input value="1500" matSliderEndThumb 
+    [formControl]="priceUpperControl"/>
   </mat-slider>
-  <button mat-raised-button>Filter price</button>
+  <button mat-raised-button
+  type="button"
+  (click)="handlePriceFilter()">Filter price</button>
 </form>
 <form class="example-form">
   <mat-form-field class="example-full-width">
@@ -13,7 +17,7 @@
       placeholder="Pick one"
       aria-label="Number"
       matInput
-      [formControl]="myControl"
+      [formControl]="categoryControl"
       [matAutocomplete]="auto"
     />
     <mat-autocomplete
