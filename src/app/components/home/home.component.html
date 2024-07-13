@@ -1,3 +1,18 @@
+<mat-toolbar>
+    <button mat-icon-button>
+        <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-icon-button>
+        <mat-icon>favorite</mat-icon>
+    </button>
+    <button mat-flat-button
+(click)="logout()" >Log out</button>
+</mat-toolbar>
+<div class="allProducts">
+    @for(product of products$ | async ;track product.pid){
+        <app-product [product]="product"/>
+    }
+</div>
 <p>home works!</p>
 <div *ngIf="currentUser$ |async as user">
     <p>{{user.email}}</p>
@@ -6,5 +21,4 @@
 </div>
 
 
-<button mat-flat-button
-(click)="logout()" >Log out</button>
+

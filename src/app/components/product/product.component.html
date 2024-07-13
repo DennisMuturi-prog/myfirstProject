@@ -1,0 +1,65 @@
+<div class="product">
+  <mat-card>
+    <img
+      (mouseenter)="slideShow()"
+      (mouseleave)="resetSlideShow()"
+      [src]="images$ | async"
+      alt=""
+      mat-card-image
+    />
+  </mat-card>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title-group>
+        <mat-card-title class="truncate">
+          {{ product.title }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ product.brand }}
+        </mat-card-subtitle>
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-card>{{ product.category }}</mat-card>
+      <mat-card>{{ product.price | currency }}</mat-card>
+      <mat-card>
+        <div style="display: flex; align-items: center">
+          <!-- Full stars for the integer part -->
+          <mat-icon *ngFor="let _ of getRatingArray(product.avg_rating)"
+          style="color: orange;"
+            >star</mat-icon
+          >
+          <!-- Partial star for the decimal part, if any -->
+          <div
+            *ngIf="product.avg_rating % 1 > 0"
+            style="position: relative; width: 24px; height: 24px"
+          >
+            <mat-icon style="color: grey">star_border</mat-icon>
+            <div [ngStyle]="getRatingStyle(product.avg_rating)">
+              <mat-icon
+                style="color: orange; position: absolute; top: 0; left: 0"
+                >star</mat-icon
+              >
+            </div>
+          </div>
+          <!-- Empty stars for the remainder -->
+          <mat-icon
+            *ngFor="let _ of getEmptyStars(product.avg_rating)"
+            style="color: grey"
+            >star_border</mat-icon
+          >
+        </div>
+      </mat-card>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button>Buy</button>
+    </mat-card-actions>
+    <mat-card-footer>
+      <span>{{ product.discount}}</span>
+      <span class="original-price">{{
+        product.original_price | currency
+      }}</span>
+      <p class="return_policy">{{ product.return_policy }}</p>
+    </mat-card-footer>
+  </mat-card>
+</div>
