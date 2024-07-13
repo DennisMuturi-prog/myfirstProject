@@ -1,0 +1,28 @@
+<form class="priceSlider">
+  <mat-slider min="1" max="1500" discrete="">
+    <input value="1" matSliderStartThumb />
+    <input value="1500" matSliderEndThumb />
+  </mat-slider>
+  <button mat-raised-button>Filter price</button>
+</form>
+<form class="example-form">
+  <mat-form-field class="example-full-width">
+    <mat-label>Category</mat-label>
+    <input
+      type="text"
+      placeholder="Pick one"
+      aria-label="Number"
+      matInput
+      [formControl]="myControl"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      (optionSelected)="handleCategorySelect($event)"
+    >
+      @for (option of filteredOptions | async; track option) {
+      <mat-option [value]="option">{{ option }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+</form>
