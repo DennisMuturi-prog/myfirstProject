@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { collection, collectionData } from '@angular/fire/firestore';
-import { Product } from '../Types/Types';
-import { BehaviorSubject, combineLatestWith, map, Observable } from 'rxjs';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Product, Slidervalue } from '../Types/Types';
+import { BehaviorSubject, combineLatestWith, map, Observable, switchMap } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +13,8 @@ export class ProoductService {
   products$ = this.getProducts();
   selectCategorySubject = new BehaviorSubject<string>('');
   selectCategoryAction$ = this.selectCategorySubject.asObservable();
+  priceRangeSubject=new BehaviorSubject<Slidervalue>({lower:1,upper:2000})
+  priceRangeAction$=this.priceRangeSubject.asObservable()
   getProducts(): Observable<Product[]> {
     const productCollection = collection(
       this.authService.firestore,
@@ -31,7 +33,11 @@ export class ProoductService {
       } else {
         return products.filter((product) => product.category == category);
       }
-    })
+    }),
   );
+  productsWithPriceAndCategoryFilter$=this.priceRangeAction$.pipe(
+    combineLatestWith(this.selectCategoryProducts$),
+    map(([priceRange,products])=>products.filter((product)=>product.price>=priceRange.lower&&product.price<=priceRange.upper))
+  )
   constructor() {}
 }
