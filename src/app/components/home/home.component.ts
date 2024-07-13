@@ -11,6 +11,7 @@ import { ProoductService } from '../../services/prooduct.service';
 import { ProductComponent } from '../product/product.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { SideNavComponent } from '../side-nav/side-nav.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner'
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,8 @@ import { SideNavComponent } from '../side-nav/side-nav.component';
     AsyncPipe,
     ProductComponent,
     MatSidenavModule,
-    SideNavComponent
+    SideNavComponent,
+    MatProgressSpinnerModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -33,7 +35,7 @@ import { SideNavComponent } from '../side-nav/side-nav.component';
 export class HomeComponent {
   authService = inject(AuthService);
   productService = inject(ProoductService);
-  products$ = this.productService.selectCategoryProducts$;
+  products$ = this.productService.productsWithPriceAndCategoryFilter$;
   currentUser$: Observable<UserAuth> = this.authService.currentUser$;
   logout() {
     this.authService.logout().subscribe();
