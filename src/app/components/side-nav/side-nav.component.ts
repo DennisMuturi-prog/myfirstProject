@@ -45,10 +45,12 @@ export class SideNavComponent implements OnInit {
     'Kids Accessories',
     'Home Lighting',
   ];
-  myControl = new FormControl('');
+  categoryControl = new FormControl('');
+  priceLowerControl=new FormControl('1')
+  priceUpperControl=new FormControl('2000')
   filteredOptions!: Observable<string[]>;
   ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
+    this.filteredOptions = this.categoryControl.valueChanges.pipe(
       startWith(''),
       map((value) => this._filter(value || ''))
     );
@@ -60,8 +62,15 @@ export class SideNavComponent implements OnInit {
       option.toLowerCase().includes(filterValue)
     );
   }
-  handleCategorySelect(category: any) {
+  handleCategorySelect(category: MatAutocompleteSelectedEvent) {
     console.log(category);
     this.productService.selectCategorySubject.next(category.option.value);
+  }
+  handlePriceFilter(){
+    this.productService.priceRangeSubject.next({
+      lower:Number(this.priceLowerControl.value),
+      upper:Number(this.priceUpperControl.value)
+    })
+
   }
 }
