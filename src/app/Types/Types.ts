@@ -29,3 +29,7 @@ export interface Product{
     discount:string,
     images:string[]
 }
+export interface Slidervalue{
+    upper:number,
+    lower:number
+}
