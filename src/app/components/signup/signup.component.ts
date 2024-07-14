@@ -19,12 +19,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { confirmPasswordValidator } from './confirm-password.validator';
 import { AuthService } from '../../services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormErrorSnackbarComponent } from '../form-error-snackbar/form-error-snackbar.component';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { catchError, Subscription } from 'rxjs';
+import { AuthSnackbarComponent } from '../auth-snackbar/auth-snackbar.component';
 
 @Component({
   selector: 'app-signup',
@@ -96,8 +98,8 @@ export class SignupComponent {
   }
   _snackBar = inject(MatSnackBar);
   authService = inject(AuthService);
-  router = inject(Router);
   hidePassword = signal(true);
+  signUpUnsub!: Subscription;
   clickPasswordHideEvent(event: MouseEvent) {
     this.hidePassword.update((previous) => !previous);
     event.stopPropagation();
@@ -112,29 +114,51 @@ export class SignupComponent {
       gender,
       marketingSource,
     } = this.signupForm.value;
-    if(firstName&&secondName&&email&&password&&dateOfBirth&&gender&&marketingSource){
+    if (
+      firstName &&
+      secondName &&
+      email &&
+      password &&
+      dateOfBirth &&
+      gender &&
+      marketingSource
+    ) {
       const registeredUser = {
-      firstName,
-      secondName,
-      email,
-      password,
-      dateOfBirth,
-      gender,
-      marketingSource,
-    };
-    this.authService.register(registeredUser).subscribe(() => {
-      this.router.navigate(['/profilepic']);
-    });
-
+        firstName,
+        secondName,
+        email,
+        password,
+        dateOfBirth,
+        gender,
+        marketingSource,
+      };
+      this.signUpUnsub = this.authService
+        .register(registeredUser)
+        .pipe(
+          catchError((err) => {
+            this._snackBar.openFromComponent(AuthSnackbarComponent, {
+              data:err,
+              duration: 10000,
+            });
+            return [];
+          })
+        )
+        .subscribe(() => {
+          this._snackBar.open('sign up successful', '', {
+            duration: 3000,
+            verticalPosition: 'top',
+          });
+        });
     }
-    
   }
   openErrorSnackBar() {
     this._snackBar.openFromComponent(FormErrorSnackbarComponent, {
       duration: 5000,
     });
   }
-  onReactiveSubmit() {
-    console.log(this.signupForm.value);
+  ngOnDestroy() {
+    if (this.signUpUnsub) {
+      this.signUpUnsub.unsubscribe();
+    }
   }
 }
