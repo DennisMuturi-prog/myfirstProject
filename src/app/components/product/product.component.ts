@@ -6,13 +6,13 @@ import { AsyncPipe, CommonModule, CurrencyPipe } from '@angular/common';
 import {
   BehaviorSubject,
   concatMap,
+  delay,
   distinctUntilChanged,
   from,
   map,
   Observable,
   of,
   switchMap,
-  timer,
 } from 'rxjs';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,8 +46,9 @@ export class ProductComponent {
       filteredUrls.shift()
       this.slideImages$ = from(filteredUrls).pipe(
         concatMap((url) =>
-          timer(1000).pipe(
-            map(() => this.sanitizer.bypassSecurityTrustUrl(url))
+          of(url).pipe(
+            delay(1000),
+            map((url) => this.sanitizer.bypassSecurityTrustUrl(url))
           )
         )
       );
