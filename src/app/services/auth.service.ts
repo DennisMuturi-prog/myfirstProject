@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,updateProfile, User, user, UserCredential } from '@angular/fire/auth';
 import { Firestore,doc,setDoc } from '@angular/fire/firestore';
-import { map, from, switchMap } from 'rxjs';
+import { map, from, switchMap, catchError,Observable ,throwError,tap} from 'rxjs';
 import { LoginUser, RegisterUser} from '../Types/Types';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -10,17 +11,17 @@ import { LoginUser, RegisterUser} from '../Types/Types';
 export class AuthService {
   firebaseAuth = inject(Auth);
   firestore = inject(Firestore);
-  currentUser$=user(this.firebaseAuth).pipe(
-    map((user:User)=>{
-      if(user){
-          const {displayName,email,uid}=user;
-          return {userName:displayName,email,userId:uid}
-      }
-      else{
-        return user
+  router=inject(Router)
+  currentUser$ = user(this.firebaseAuth).pipe(
+    map((user: User) => {
+      if (user) {
+        const { displayName, email, uid } = user;
+        return { userName: displayName, email, userId: uid };
+      } else {
+        return user;
       }
     })
-  )
+  );
   register(user: RegisterUser) {
     return from(
       createUserWithEmailAndPassword(
@@ -29,8 +30,14 @@ export class AuthService {
         user.password
       )
     ).pipe(
-      switchMap((response)=>from(updateProfile(response.user,{displayName:`${user.firstName} ${user.secondName}`}))),
-      switchMap(()=>{
+      switchMap((response) =>
+        from(
+          updateProfile(response.user, {
+            displayName: `${user.firstName} ${user.secondName}`,
+          })
+        )
+      ),
+      switchMap(() => {
         const userRef = doc(
           this.firestore,
           `users/${this.firebaseAuth.currentUser?.uid}`
@@ -45,24 +52,44 @@ export class AuthService {
           marketingSource,
         };
         return from(setDoc(userRef, userObject));
+      }),
+      tap(()=>{
+        this.router.navigate(['profilepic'])
+      }),
+      catchError(this.handleError)
+    );
+  }
+  logout() {
+    return from(signOut(this.firebaseAuth)).pipe(
+      tap(()=>{
+        this.router.navigate(['signin'])
       })
     );
   }
-  logout(){
+  login(user: LoginUser) {
     return from(
-      signOut(this.firebaseAuth)
-    )
+      signInWithEmailAndPassword(this.firebaseAuth, user.email, user.password)
+    ).pipe(
+      tap(()=>{
+        this.router.navigate(['home'])
+      }),
+      catchError(this.handleError))
   }
-  login(user:LoginUser){
-    return from(
-      signInWithEmailAndPassword(this.firebaseAuth,
-        user.email,
-        user.password
-      )
-    )
+  private handleError(err: any): Observable<never> {
+    // in a real world app, we may send the server to some remote logging infrastructure
+    // instead of just logging it to the console
+    let errorMessage: string;
+    if (err.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      errorMessage = `An error occurred: ${err.error.message}`;
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      errorMessage = `${err.code}: ${err.message}`;
+    }
+    console.error(err);
+    return throwError(()=>new Error(errorMessage));
   }
- 
- 
 
   constructor() {}
 }
