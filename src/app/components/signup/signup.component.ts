@@ -18,6 +18,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { confirmPasswordValidator } from './confirm-password.validator';
@@ -27,6 +28,8 @@ import { FormErrorSnackbarComponent } from '../form-error-snackbar/form-error-sn
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { catchError, Subscription } from 'rxjs';
 import { AuthSnackbarComponent } from '../auth-snackbar/auth-snackbar.component';
+import { mustBeChecked } from './acceptTerms.validator';
+import { genderPicked } from './genderPick.validator';
 
 @Component({
   selector: 'app-signup',
@@ -44,6 +47,7 @@ import { AuthSnackbarComponent } from '../auth-snackbar/auth-snackbar.component'
     MatDatepickerModule,
     MatInputModule,
     RouterLink,
+    MatProgressBarModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './signup.component.html',
@@ -62,10 +66,10 @@ export class SignupComponent {
         Validators.pattern(this.StrongPasswordRegx),
       ]),
       confirmPassword: new FormControl('', Validators.required),
-      gender: new FormControl('', Validators.required),
+      gender: new FormControl('', [Validators.required,genderPicked]),
       dateOfBirth: new FormControl('', Validators.required),
       marketingSource: new FormControl('', Validators.required),
-      acceptTerms: new FormControl('', Validators.required),
+      acceptTerms: new FormControl('', [Validators.required,mustBeChecked]),
     },
     { validators: confirmPasswordValidator }
   );
@@ -99,12 +103,14 @@ export class SignupComponent {
   _snackBar = inject(MatSnackBar);
   authService = inject(AuthService);
   hidePassword = signal(true);
+  showProgressBar=signal(false)
   signUpUnsub!: Subscription;
   clickPasswordHideEvent(event: MouseEvent) {
     this.hidePassword.update((previous) => !previous);
     event.stopPropagation();
   }
   onSubmit() {
+    this.showProgressBar.set(true)
     const {
       firstName,
       secondName,
@@ -136,6 +142,7 @@ export class SignupComponent {
         .register(registeredUser)
         .pipe(
           catchError((err) => {
+            this.showProgressBar.set(false)
             this._snackBar.openFromComponent(AuthSnackbarComponent, {
               data:err,
               duration: 10000,
