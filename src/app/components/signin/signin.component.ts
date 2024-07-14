@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,8 @@ import { FormErrorSnackbarComponent } from '../form-error-snackbar/form-error-sn
 import { AuthService } from '../../services/auth.service';
 import { catchError, Subscription } from 'rxjs';
 import { AuthSnackbarComponent } from '../auth-snackbar/auth-snackbar.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-sign-in',
@@ -24,12 +26,14 @@ import { AuthSnackbarComponent } from '../auth-snackbar/auth-snackbar.component'
     MatIconModule,
     MatInputModule,
     RouterLink,
+    MatProgressBarModule
   ],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css',
 })
 export class SigninComponent {
   _snackBar = inject(MatSnackBar);
+  showProgressBar=signal(false)
   authService = inject(AuthService);
   loginUnsub!: Subscription;
   user: LoginUser = {
@@ -47,10 +51,12 @@ export class SigninComponent {
     });
   }
   onSubmit() {
+    this.showProgressBar.set(true)
     this.loginUnsub = this.authService
       .login(this.user)
       .pipe(
         catchError((err) => {
+          this.showProgressBar.set(false)
           this._snackBar.openFromComponent(AuthSnackbarComponent, {
             data: `Incorrect password/email ${err}`,
             duration: 10000,
