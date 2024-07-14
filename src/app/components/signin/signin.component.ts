@@ -4,12 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { LoginUser} from '../../Types/Types';
+import { LoginUser } from '../../Types/Types';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormErrorSnackbarComponent } from '../form-error-snackbar/form-error-snackbar.component';
 import { AuthService } from '../../services/auth.service';
+import { catchError, Subscription } from 'rxjs';
+import { AuthSnackbarComponent } from '../auth-snackbar/auth-snackbar.component';
 
 @Component({
   selector: 'app-sign-in',
@@ -28,7 +30,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class SigninComponent {
   _snackBar = inject(MatSnackBar);
-  authService=inject(AuthService)
+  authService = inject(AuthService);
+  loginUnsub!: Subscription;
   user: LoginUser = {
     email: '',
     password: '',
@@ -44,6 +47,28 @@ export class SigninComponent {
     });
   }
   onSubmit() {
-    this.authService.login(this.user).subscribe()
+    this.loginUnsub = this.authService
+      .login(this.user)
+      .pipe(
+        catchError((err) => {
+          this._snackBar.openFromComponent(AuthSnackbarComponent, {
+            data: `Incorrect password/email ${err}`,
+            duration: 10000,
+            verticalPosition: 'top',
+          });
+          return [];
+        })
+      )
+      .subscribe(() => {
+        this._snackBar.open('successfully logged in!', '', {
+          duration: 3000,
+          verticalPosition: 'top',
+        });
+      });
+  }
+  ngOnDestroy() {
+    if (this.loginUnsub) {
+      this.loginUnsub.unsubscribe();
+    }
   }
 }
