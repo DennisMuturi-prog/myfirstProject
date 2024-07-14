@@ -1,3 +1,6 @@
+@if(showProgressBar()){
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 <mat-card>
   <mat-card-header>
     <mat-card-title>Sign up for our site</mat-card-title>
@@ -142,8 +145,8 @@
             >Prefer not to say</mat-radio-button
           >
         </mat-radio-group>
-        @if(gender?.invalid&&(gender?.touched)){
-        @if(gender?.hasError('required')){
+        @if(gender?.invalid&&(acceptTerms?.dirty)){
+        @if(gender?.hasError('pickGender')){
         <mat-error>Your gender is required</mat-error>
         } }
       </div>
@@ -171,8 +174,8 @@
           >Accept the terms and conditions of our site.</mat-checkbox
         >
         <mat-hint>Read our privacy policy and accept</mat-hint>
-        @if(acceptTerms?.invalid&&(acceptTerms?.touched)){
-        @if(acceptTerms?.hasError('required')){
+        @if(acceptTerms?.invalid&&(marketingSource?.touched)){
+        @if(acceptTerms?.hasError('mustBeChecked')){
         <mat-error>You must agree to the terms and conditions</mat-error>
         } }
       </div>
