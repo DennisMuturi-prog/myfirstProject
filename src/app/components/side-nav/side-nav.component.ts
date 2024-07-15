@@ -5,7 +5,7 @@ import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/mate
 import { AsyncPipe } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable ,startWith,map,tap} from 'rxjs';
-import { ProoductService } from '../../services/prooduct.service';
+import { ProductService } from '../../services/product.service';
 import {MatSliderModule} from '@angular/material/slider'
 import { MatButtonModule } from '@angular/material/button';
 
@@ -26,7 +26,7 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './side-nav.component.css',
 })
 export class SideNavComponent implements OnInit {
-  productService = inject(ProoductService);
+  productService = inject(ProductService);
   categories: string[] = [
     'all',
     'Computers',
