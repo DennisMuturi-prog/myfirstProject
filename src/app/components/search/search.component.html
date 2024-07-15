@@ -1,0 +1,11 @@
+<form >
+    <mat-form-field appearance="outline">
+        <input type="text" matInput
+        placeholder="search"
+        [formControl]="searchControl"/>
+        <button mat-icon-button matSuffix
+        type="button" (click)="onSearch()">
+            <mat-icon>search</mat-icon>
+        </button>
+    </mat-form-field>
+</form>
