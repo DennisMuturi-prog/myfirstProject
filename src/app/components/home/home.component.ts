@@ -45,4 +45,7 @@ export class HomeComponent {
   logout() {
     this.authService.logout().subscribe();
   }
+  removeFilterChip(chip:string){
+    this.productService.removeFilterChipsSubject.next(chip)
+  }
 }
