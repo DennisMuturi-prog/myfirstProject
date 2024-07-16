@@ -18,7 +18,7 @@ export class SearchComponent {
   searchControl=new FormControl('')
   onSearch(){
     if(this.searchControl.value){
-      this.productService.searchSubject.next(this.searchControl.value)
+      this.productService.searchSubject.next(this.searchControl.value.toLowerCase())
     }
   }
 
