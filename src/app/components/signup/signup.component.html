@@ -10,13 +10,14 @@
     <form
       [formGroup]="signupForm"
       (ngSubmit)="signupForm.valid ? onSubmit() : openErrorSnackBar()"
+      #form="ngForm"
     >
       <div>
         <mat-form-field>
           <mat-label>First Name</mat-label>
           <input matInput type="text" formControlName="firstName" />
           <mat-hint>Enter your first name</mat-hint>
-          @if(firstName?.invalid&&(firstName?.touched)){
+          @if(firstName?.invalid&&(firstName?.touched || form.submitted)){
           @if(firstName?.hasError('required')){
           <mat-error>First name is required</mat-error>
           } }
@@ -27,7 +28,7 @@
           <mat-label>Second Name</mat-label>
           <input matInput type="text" formControlName="secondName" />
           <mat-hint>Enter your second name</mat-hint>
-          @if(secondName?.invalid&&(secondName?.touched)){
+          @if(secondName?.invalid&&(secondName?.touched || form.submitted)){
           @if(secondName?.hasError('required')){
           <mat-error>Second name is required</mat-error>
           } }
@@ -39,7 +40,7 @@
           <mat-label>Email</mat-label>
           <input matInput type="email" formControlName="email" />
           <mat-hint>Enter your email address</mat-hint>
-          @if(email?.invalid&&(email?.dirty|| email?.touched)){
+          @if(email?.invalid&&(email?.touched || form.submitted)){
           @if(email?.hasError('required')){
           <mat-error>Email is required</mat-error>
           } @if(email?.hasError('email')){
@@ -70,7 +71,7 @@
           </button>
           <mat-hint align="start">input strong password</mat-hint>
           <mat-hint align="end">{{ password?.value?.length }}/8</mat-hint>
-          @if(password?.invalid&&(password?.dirty || password?.touched)){
+          @if(password?.invalid&&(password?.touched || form.submitted)){
           @if(password?.hasError('required')){
           <mat-error>Password is required</mat-error>
           } @if(password?.hasError('pattern')){
@@ -104,8 +105,7 @@
             }}</mat-icon>
           </button>
           <mat-hint>Repeat password</mat-hint>
-          @if(confirmPassword?.invalid&&(confirmPassword?.dirty ||
-          confirmPassword?.touched)){
+          @if(confirmPassword?.invalid&&( confirmPassword?.touched || form.submitted)){
           @if(confirmPassword?.hasError('required')){
           <mat-error>Confirm Password is required</mat-error>
           } @if(confirmPassword?.hasError('passwordMismatch')){
@@ -127,7 +127,7 @@
             [for]="picker"
           ></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          @if(dateOfBirth?.invalid&&(dateOfBirth?.touched)){
+          @if(dateOfBirth?.invalid&&(dateOfBirth?.touched || form.submitted)){
           @if(dateOfBirth?.hasError('required')){
           <mat-error>Date of birth is required</mat-error>
           } }
@@ -145,7 +145,7 @@
             >Prefer not to say</mat-radio-button
           >
         </mat-radio-group>
-        @if(gender?.invalid&&(acceptTerms?.dirty)){
+        @if(gender?.invalid&&(form.submitted)){
         @if(gender?.hasError('pickGender')){
         <mat-error>Your gender is required</mat-error>
         } }
@@ -162,7 +162,7 @@
             <mat-option value="friends">Friends</mat-option>
           </mat-select>
           <mat-hint>Where did you hear us from?</mat-hint>
-          @if(marketingSource?.invalid&&(marketingSource?.touched)){
+          @if(marketingSource?.invalid&&(marketingSource?.touched || form.submitted)){
           @if(marketingSource?.hasError('required')){
           <mat-error>Marketing source is required</mat-error>
           } }
@@ -174,7 +174,7 @@
           >Accept the terms and conditions of our site.</mat-checkbox
         >
         <mat-hint>Read our privacy policy and accept</mat-hint>
-        @if(acceptTerms?.invalid&&(marketingSource?.touched)){
+        @if(acceptTerms?.invalid&&(acceptTerms?.touched || form.submitted )){
         @if(acceptTerms?.hasError('mustBeChecked')){
         <mat-error>You must agree to the terms and conditions</mat-error>
         } }
