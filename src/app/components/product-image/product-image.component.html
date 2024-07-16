@@ -1,0 +1,9 @@
+<mat-card>
+    <img
+      (mouseenter)="slideShow()"
+      (mouseleave)="resetSlideShow()"
+      [src]="images$ | async"
+      alt=""
+      mat-card-image
+    />
+  </mat-card>

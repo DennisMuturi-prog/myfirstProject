@@ -2,6 +2,7 @@
 .product{
     display: flex;
     margin-bottom: 10px;
+    padding: 5px;
     margin-right: 5px;
 }
 .truncate {
@@ -9,11 +10,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 280px; /* Adjust based on your requirement */
-}
-img{
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
 }
 .original-price{
     text-decoration: line-through;

@@ -33,3 +33,16 @@ export interface Slidervalue{
     upper:number,
     lower:number
 }
+export interface CartProduct {
+  title: string;
+  category: string;
+  price: number;
+  original_price: number;
+  pid: string;
+  return_policy: string;
+  brand: string;
+  avg_rating: number;
+  discount: string;
+  images: string[];
+  docReference:string
+}

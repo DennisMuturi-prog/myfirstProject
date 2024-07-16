@@ -8,6 +8,9 @@
         <button mat-icon-button>
             <mat-icon>favorite</mat-icon>
         </button>
+         <button mat-icon-button>
+            <mat-icon [matBadge]="noOfCartItems$ | async">shopping_cart</mat-icon>
+        </button>
         <button mat-flat-button
         (click)="logout()" >Log out</button>
     </mat-toolbar-row>

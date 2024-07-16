@@ -14,6 +14,8 @@ import { SideNavComponent } from '../side-nav/side-nav.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner'
 import { SearchComponent } from '../search/search.component';
 import {MatChipsModule} from '@angular/material/chips'
+import {MatBadgeModule} from '@angular/material/badge'
+import { ShoppingCartService } from '../../services/shopping-cart.service';
 
 @Component({
   selector: 'app-home',
@@ -31,7 +33,8 @@ import {MatChipsModule} from '@angular/material/chips'
     SideNavComponent,
     MatProgressSpinnerModule,
     SearchComponent,
-    MatChipsModule
+    MatChipsModule,
+    MatBadgeModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -39,9 +42,11 @@ import {MatChipsModule} from '@angular/material/chips'
 export class HomeComponent {
   authService = inject(AuthService);
   productService = inject(ProductService);
+  cartService=inject(ShoppingCartService)
+  noOfCartItems$=this.cartService.noOfItemsInCart$
   products$ = this.productService.products$;
   filterChips$=this.productService.filterChips$
-  currentUser$: Observable<UserAuth> = this.authService.currentUser$;
+  currentUser$: Observable<UserAuth | null> = this.authService.currentUser$;
   logout() {
     this.authService.logout().subscribe();
   }

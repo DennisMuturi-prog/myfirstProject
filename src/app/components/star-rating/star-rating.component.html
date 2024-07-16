@@ -1,0 +1,28 @@
+<mat-card>
+        <div style="display: flex; align-items: center">
+          <!-- Full stars for the integer part -->
+          <mat-icon *ngFor="let _ of getRatingArray(averageRating())"
+          style="color: orange;"
+            >star</mat-icon
+          >
+          <!-- Partial star for the decimal part, if any -->
+          <div
+            *ngIf="averageRating() % 1 > 0"
+            style="position: relative; width: 24px; height: 24px"
+          >
+            <mat-icon style="color: grey">star_border</mat-icon>
+            <div [ngStyle]="getRatingStyle(averageRating())">
+              <mat-icon
+                style="color: orange; position: absolute; top: 0; left: 0"
+                >star</mat-icon
+              >
+            </div>
+          </div>
+          <!-- Empty stars for the remainder -->
+          <mat-icon
+            *ngFor="let _ of getEmptyStars(averageRating())"
+            style="color: grey"
+            >star_border</mat-icon
+          >
+        </div>
+      </mat-card>
