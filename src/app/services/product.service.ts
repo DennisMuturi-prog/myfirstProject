@@ -9,7 +9,9 @@ import {
   shareReplay,
   switchMap,
   merge,
-  scan
+  scan,
+  Subject,
+  tap
 } from 'rxjs';
 
 @Injectable({
@@ -46,7 +48,7 @@ export class ProductService {
   }
   categoryHandler(category: string) {
     if (category == '' || category == 'all') {
-      return (state: Product[]) => [...state];
+      return (state: Product[]) => state;
     }
     return (state: Product[]) => [
       ...state.filter((product) => product.category == category),
@@ -54,7 +56,7 @@ export class ProductService {
   }
   searchHandler(searchTerm: string) {
     if (searchTerm == '') {
-      return (state: Product[]) => [...state];
+      return (state: Product[]) => state;
     }
     return (state: Product[]) => [
       ...state.filter(
@@ -67,7 +69,7 @@ export class ProductService {
   }
   priceHandler(priceRange: Slidervalue) {
     if (priceRange.lower == 1 && priceRange.upper == 2000) {
-      return (state: Product[]) => [...state];
+      return (state: Product[]) => state;
     }
     return (state: Product[]) => [
       ...state.filter(
@@ -99,33 +101,56 @@ export class ProductService {
     })
   );
   chipsHandler(value: Slidervalue) {
-    if(value.lower==1&&value.upper==2000){
-      return (state: string[]) => state
+    if (value.lower == 1 && value.upper == 2000) {
+      return (state: string[]) =>state;
     }
     return (state: string[]) => [
-      ...state,
-      `lowest: $${value.lower}`,
-      `highest: $${value.upper}`,
+      ...state.filter((chip) => !chip.includes('lowest')),
+      `lowest:$${value.lower} | highest:$${value.upper}`,
     ];
-   
   }
-  chipsCategorySearch(value:string){
-    if(value==''){
+  chipsSearch(value: string) {
+    if (value == '') {
       return (state: string[]) => state;
     }
-     return (state: string[]) => [
-       ...state,
-       value
-     ];
-
+    return (state: string[]) => [
+      ...state.filter((chip) => !chip.includes('search')),
+      `search:${value}`,
+    ];
   }
-  filterChips$ = merge(
-    this.searchSubject$.pipe(map(this.chipsCategorySearch)),
-    this.selectCategorySubject$.pipe(map(this.chipsCategorySearch)),
-    this.priceRangeSubject$.pipe(map(this.chipsHandler))
-  ).pipe(
-    scan((acc:string[], stateHandler) =>stateHandler(acc),[])
+  chipsCategory(value: string) {
+    if (value == '') {
+      return (state: string[]) =>state;
+    }
+    return (state: string[]) => [...state.filter((chip)=>!chip.includes('category')),
+      `category:${value}`
+    ];
+  }
+  removeChipsHandler(value: string) {
+    return (state: string[]) => [...state.filter((chip) => chip !== value)];
+  }
+  removeFilterChipsSubject = new Subject<string>();
+  removeChipsAction$ = this.removeFilterChipsSubject.asObservable().pipe(
+    tap((value)=>{
+      let myFilterOptions=value.split(':')
+      if(myFilterOptions[0]=='category'){
+        this.selectCategorySubject.next('')
+      }
+      else if(myFilterOptions[0]=='search'){
+        this.searchSubject.next('')
+      }
+      else if(myFilterOptions[0]=='lowest'){
+        this.priceRangeSubject.next({lower:1,upper:2000})
+      }
+
+    })
   );
+  filterChips$ = merge(
+    this.searchSubject$.pipe(map(this.chipsSearch)),
+    this.selectCategorySubject$.pipe(map(this.chipsCategory)),
+    this.priceRangeSubject$.pipe(map(this.chipsHandler)),
+    this.removeChipsAction$.pipe(map(this.removeChipsHandler))
+  ).pipe(scan((acc: string[], stateHandler) => stateHandler(acc), []));
 
   constructor() {}
 }
