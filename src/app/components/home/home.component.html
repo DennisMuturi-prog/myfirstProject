@@ -1,20 +1,28 @@
 <mat-toolbar>
-    <button 
-    (click)="sidenav.toggle()"
-    mat-icon-button>
-        <mat-icon>menu</mat-icon>
-    </button>
-    <button mat-icon-button>
-        <mat-icon>favorite</mat-icon>
-    </button>
-    <app-search></app-search>
-    <mat-chip-set>
-        @for(chip of filterChips$ | async;track chip.length ){
-            <mat-chip>{{chip}}</mat-chip>
-        }
-    </mat-chip-set>
-    <button mat-flat-button
-(click)="logout()" >Log out</button>
+    <mat-toolbar-row>
+        <button
+        (click)="sidenav.toggle()"
+        mat-icon-button>
+            <mat-icon>menu</mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon>favorite</mat-icon>
+        </button>
+        <button mat-flat-button
+        (click)="logout()" >Log out</button>
+    </mat-toolbar-row>
+ <mat-toolbar-row>
+     <app-search></app-search>
+        <mat-chip-set>
+            @for(chip of filterChips$ | async;track chip.length ){
+                <mat-chip (removed)="removeFilterChip(chip)">{{chip}}
+                    <button matChipRemove>
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </mat-chip>
+            }
+        </mat-chip-set>
+ </mat-toolbar-row>
 </mat-toolbar>
 <mat-sidenav-container>
     <mat-sidenav #sidenav><app-side-nav></app-side-nav></mat-sidenav>
