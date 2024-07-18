@@ -43,7 +43,7 @@ export class HomeComponent {
   authService = inject(AuthService);
   productService = inject(ProductService);
   cartService=inject(ShoppingCartService)
-  noOfCartItems$=this.cartService.noOfItemsInCart$
+  //noOfCartItems$=this.cartService.noOfItemsInCart$
   products$ = this.productService.products$;
   filterChips$=this.productService.filterChips$
   currentUser$: Observable<UserAuth | null> = this.authService.currentUser$;
