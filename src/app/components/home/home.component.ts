@@ -46,7 +46,7 @@ export class HomeComponent {
   noOfCartItems$=this.cartService.noOfItemsInCart$
   products$ = this.productService.products$;
   filterChips$=this.productService.filterChips$
-  currentUser$: Observable<UserAuth | null> = this.authService.currentUser$;
+  //currentUser$: Observable<UserAuth | null> = this.authService.currentUser$;
   logout() {
     this.authService.logout().subscribe();
   }

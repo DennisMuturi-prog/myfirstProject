@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,updateProfile, User, user, UserCredential } from '@angular/fire/auth';
 import { Firestore,doc,setDoc } from '@angular/fire/firestore';
-import { map, from, switchMap, catchError,Observable ,throwError,tap} from 'rxjs';
+import { map, from, switchMap, catchError,Observable ,throwError,tap, shareReplay} from 'rxjs';
 import { LoginUser, RegisterUser, UserAuth} from '../Types/Types';
 import { Router } from '@angular/router';
 
@@ -20,7 +20,8 @@ export class AuthService {
       } else {
         return user;
       }
-    })
+    }),
+    shareReplay(1)
   );
   register(user: RegisterUser) {
     return from(
