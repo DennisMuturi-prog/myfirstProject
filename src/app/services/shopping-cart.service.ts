@@ -16,15 +16,17 @@ interface Cart{
 })
 export class ShoppingCartService {
   authService = inject(AuthService);
-  productService=inject(ProductService)
+  productService = inject(ProductService);
+  allCartItems$=this.getAllCart()
   firestore = this.authService.firestore;
   currentUser$ = this.authService.currentUser$
-  fetchedProducts$=this.productService.fetchedProducts$
+  fetchedProducts$ = this.productService.fetchedProducts$;
   addToCartSubject = new Subject<Product>();
   addToCartAction$ = this.addToCartSubject.asObservable();
   removeFromCartSubject = new Subject<Product>();
   removeFromCartAction$ = this.removeFromCartSubject.asObservable();
   fetchedCartItems$ = this.currentUser$.pipe(
+    tap((item) => console.log(item)),
     switchMap((user) => {
       if (user) {
         return this.getCartItems(user?.userId);
@@ -36,48 +38,38 @@ export class ShoppingCartService {
   addCartItem$ = this.addToCartAction$.pipe(
     combineLatestWith(this.currentUser$),
     switchMap(([product, user]) => {
+    console.log(user)
       if (user !== null) {
         return this.saveCartitem(product, user.userId);
       } else {
         return EMPTY;
       }
-    }),
-  );
-  cumulativeCartAddFromServerAndLocal$ = merge(
-    this.fetchedCartItems$.pipe(map(this.serverAndLocalAddHandler)),
-    this.addCartItem$.pipe(map(this.addHandler))
-  ).pipe(
-    scan((state: CartProduct[], stateHandler) => stateHandler(state), []),
-    shareReplay(1),
+    })
   );
   removedSavedCartItem$ = this.removeFromCartAction$.pipe(
-    combineLatestWith(this.cumulativeCartAddFromServerAndLocal$),
+    combineLatestWith(this.fetchedCartItems$),
     map(([itemToRemove, cartItems]) => [
       ...cartItems.filter((cartItem) => cartItem.pid == itemToRemove.pid),
     ]),
     concatMap((cartItemToRemove) => this.removeCartItem(cartItemToRemove[0]))
   );
   cartItems$ = merge(
-    this.cumulativeCartAddFromServerAndLocal$.pipe(map(this.serverAndLocalAddHandler)),
+    this.fetchedCartItems$.pipe(map(this.serverCartAddHandler)),
+    this.addCartItem$.pipe(map(this.addHandler)),
     this.removedSavedCartItem$.pipe(map(this.deleteHandler))
   ).pipe(
     scan((state: CartProduct[], stateHandler) => stateHandler(state), []),
-    tap((items)=>console.log(items)),
     shareReplay(1)
   );
   noOfItemsInCart$ = this.cartItems$.pipe(map((cartItems) => cartItems.length));
-  addHandler(Product: CartProduct) {
-    return (state: CartProduct[]) => [...state, Product];
+  addHandler() {
+    return (state: CartProduct[]) => state;
   }
-  serverAndLocalAddHandler(products:CartProduct[]){
-    return (state: CartProduct[]) => [...state, ...products
-    ];
-
+  deleteHandler() {
+    return (state: CartProduct[]) => state;
   }
-  deleteHandler(productId: string) {
-    return (state: CartProduct[]) => [
-      ...state.filter((Productitem) => Productitem.pid !== productId),
-    ];
+  serverCartAddHandler(products: CartProduct[]) {
+    return () => [...products];
   }
   saveCartitem(product: Product, userId: string) {
     return from(
@@ -85,43 +77,38 @@ export class ShoppingCartService {
         cartProductId: product.pid,
         userId,
       })
-    ).pipe(
-      map((docRef) => ({ ...product, docReference: docRef.id })),
     );
   }
   removeCartItem(product: CartProduct) {
     return from(
       deleteDoc(doc(this.firestore, 'cartItems', product.docReference))
-    ).pipe(map(() => product.pid));
+    );
   }
   firstCartItemsHandler(expenses: Product[]) {
     return (state: Product[]) => [...state, ...expenses];
   }
-  getCartDetails(productId:string){
-    const cartCollection = collection(this.firestore, 'cartItems');
-    const q = query(cartCollection, where('pid', '==', productId));
-    return collectionData<Product[]>(q, { idField: 'docReference' });
-
-
-  }
   getCartItems(userId: string): Observable<CartProduct[]> {
     const cartCollection = collection(this.firestore, 'cartItems');
     const q = query(cartCollection, where('userId', '==', userId));
-    return collectionData<Cart[]>(q,{idField:'docReference'}).pipe(
+    return collectionData<Cart[]>(q, { idField: 'docReference' }).pipe(
+      //tap((items)=>console.log(items)),
       combineLatestWith(this.fetchedProducts$),
-      map(([cartItems,products])=>{
-        console.log(cartItems)
-        return cartItems.map((item:Cart)=>{
-          let details=products.find((currentValue:Product)=>{
-            return currentValue.pid==item.cartProductId
-          })
-          return ({...details,docReference:item.docReference})
-        })
+      map(([cartItems, products]) => {
+        return cartItems.map((item: Cart) => {
+          let details = products.find((currentValue: Product) => {
+            return currentValue.pid == item.cartProductId;
+          });
+          return { ...details, docReference: item.docReference };
+        });
       }),
-      tap((items)=>console.log(items)),
-
-
+      tap((items) => console.log(items))
     );
+  }
+  getAllCart():Observable<Cart[]>{
+    const cartCollection = collection(this.firestore, 'cartItems');
+    //const q = query(cartCollection, where('userId', '==', userId));
+    return collectionData(cartCollection, { idField: 'docReference' });
+
   }
 
   constructor() {}

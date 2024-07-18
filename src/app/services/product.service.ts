@@ -20,8 +20,8 @@ import {
 export class ProductService {
   authService = inject(AuthService);
   fetchedProducts$ = this.getProducts().pipe(
+    //tap(products=>console.log(products)),
     shareReplay(1),
-    tap(items=>console.log(items))
   );
   selectCategorySubject = new BehaviorSubject<string>('');
   selectCategorySubject$ = this.selectCategorySubject
