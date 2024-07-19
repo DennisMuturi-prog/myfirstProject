@@ -11,7 +11,8 @@ import {
   merge,
   scan,
   Subject,
-  tap
+  tap,
+  combineLatestWith
 } from 'rxjs';
 
 @Injectable({
@@ -20,13 +21,11 @@ import {
 export class ProductService {
   authService = inject(AuthService);
   fetchedProducts$ = this.getProducts();
-  selectCategorySubject = new BehaviorSubject<string>('');
+  selectCategorySubject = new BehaviorSubject<string>('all');
   selectCategorySubject$ = this.selectCategorySubject
     .asObservable()
     .pipe(shareReplay(1));
-  selectCategoryAction$ = this.selectCategorySubject$.pipe(
-    map(this.categoryHandler)
-  );
+  selectCategoryAction$ = this.selectCategorySubject$
   priceRangeSubject = new BehaviorSubject<Slidervalue>({
     lower: 1,
     upper: 2000,
@@ -38,6 +37,21 @@ export class ProductService {
   searchSubject = new BehaviorSubject<string>('');
   searchSubject$ = this.searchSubject.asObservable().pipe(shareReplay(1));
   searchAction$ = this.searchSubject$.pipe(map(this.searchHandler));
+  productsByCategory$: Observable<Map<string, Product[]>> =
+    this.fetchedProducts$.pipe(
+      map((products) => {
+        const productsByCategory = new Map<string, Product[]>();
+        productsByCategory.set('all',[...products])
+        products.forEach((product) => {
+          if (!productsByCategory.has(product.category)) {
+            productsByCategory.set(product.category, [product]);
+          } else {
+            productsByCategory.get(product.category)?.push(product);
+          }
+        });
+        return productsByCategory;
+      })
+    );
   getProducts(): Observable<Product[]> {
     const productCollection = collection(
       this.authService.firestore,
@@ -80,16 +94,13 @@ export class ProductService {
   }
 
   categoryProducts$ = this.selectCategoryAction$.pipe(
-    switchMap((changeFunction) => {
-      return this.fetchedProducts$.pipe(
-        map((products) => changeFunction(products))
-      );
-    })
+    combineLatestWith(this.productsByCategory$),
+    map(([category,productsWithCategory])=>productsWithCategory.get(category))
   );
   priceProducts$ = this.priceRangeAction$.pipe(
     switchMap((changeFunction) => {
       return this.categoryProducts$.pipe(
-        map((products) => changeFunction(products))
+        map((products) => changeFunction(products || []))
       );
     })
   );
@@ -102,7 +113,7 @@ export class ProductService {
   );
   chipsHandler(value: Slidervalue) {
     if (value.lower == 1 && value.upper == 2000) {
-      return (state: string[]) =>state;
+      return (state: string[]) => state;
     }
     return (state: string[]) => [
       ...state.filter((chip) => !chip.includes('lowest')),
@@ -120,10 +131,11 @@ export class ProductService {
   }
   chipsCategory(value: string) {
     if (value == '') {
-      return (state: string[]) =>state;
+      return (state: string[]) => state;
     }
-    return (state: string[]) => [...state.filter((chip)=>!chip.includes('category')),
-      `category:${value}`
+    return (state: string[]) => [
+      ...state.filter((chip) => !chip.includes('category')),
+      `category:${value}`,
     ];
   }
   removeChipsHandler(value: string) {
@@ -131,18 +143,15 @@ export class ProductService {
   }
   removeFilterChipsSubject = new Subject<string>();
   removeChipsAction$ = this.removeFilterChipsSubject.asObservable().pipe(
-    tap((value)=>{
-      let myFilterOptions=value.split(':')
-      if(myFilterOptions[0]=='category'){
-        this.selectCategorySubject.next('')
+    tap((value) => {
+      let myFilterOptions = value.split(':');
+      if (myFilterOptions[0] == 'category') {
+        this.selectCategorySubject.next('');
+      } else if (myFilterOptions[0] == 'search') {
+        this.searchSubject.next('');
+      } else if (myFilterOptions[0] == 'lowest') {
+        this.priceRangeSubject.next({ lower: 1, upper: 2000 });
       }
-      else if(myFilterOptions[0]=='search'){
-        this.searchSubject.next('')
-      }
-      else if(myFilterOptions[0]=='lowest'){
-        this.priceRangeSubject.next({lower:1,upper:2000})
-      }
-
     })
   );
   filterChips$ = merge(
