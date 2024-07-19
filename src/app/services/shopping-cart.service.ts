@@ -36,7 +36,6 @@ export class ShoppingCartService {
     return collectionData(userQuery, { idField: 'id' });
   }
   userFetchedCartItems$: Observable<Cart[]> = this.currentUser$.pipe(
-    tap((items) => console.log(items)),
     switchMap((user) => {
       if (user) {
         return this.getCartItems(user?.userId);
