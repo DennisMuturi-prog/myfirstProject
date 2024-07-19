@@ -57,7 +57,6 @@ export class ProductService {
       this.authService.firestore,
       'products'
     );
-    console.log('fetch');
     return collectionData<Product[]>(productCollection);
   }
   categoryHandler(category: string) {
@@ -130,7 +129,7 @@ export class ProductService {
     ];
   }
   chipsCategory(value: string) {
-    if (value == '') {
+    if (value=='all') {
       return (state: string[]) => state;
     }
     return (state: string[]) => [
@@ -146,7 +145,7 @@ export class ProductService {
     tap((value) => {
       let myFilterOptions = value.split(':');
       if (myFilterOptions[0] == 'category') {
-        this.selectCategorySubject.next('');
+        this.selectCategorySubject.next('all');
       } else if (myFilterOptions[0] == 'search') {
         this.searchSubject.next('');
       } else if (myFilterOptions[0] == 'lowest') {
