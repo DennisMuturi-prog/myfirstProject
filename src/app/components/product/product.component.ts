@@ -26,11 +26,11 @@ export class ProductComponent {
   cartService=inject(ShoppingCartService)
   buyItem():void{
     if(this.alreadyBought()){
-      this.cartService.removeFromCartSubject.next(this.product())
+      //this.cartService.removeFromCartSubject.next(this.product())
       this.alreadyBought.set(false)
     }
     else{
-       this.cartService.addToCartSubject.next(this.product());
+       //this.cartService.addToCartSubject.next(this.product());
        this.alreadyBought.set(true)
     }
   }

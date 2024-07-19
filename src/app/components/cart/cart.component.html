@@ -1,0 +1,8 @@
+<table mat-table [dataSource]="cartItems$">
+  <mat-text-column name="title"></mat-text-column>
+  <mat-text-column name="brand"></mat-text-column>
+  <mat-text-column name="quantity"></mat-text-column>
+  <mat-text-column name="price"></mat-text-column>
+  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+  <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+</table>

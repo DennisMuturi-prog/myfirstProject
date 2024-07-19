@@ -16,6 +16,7 @@ import { SearchComponent } from '../search/search.component';
 import {MatChipsModule} from '@angular/material/chips'
 import {MatBadgeModule} from '@angular/material/badge'
 import { ShoppingCartService } from '../../services/shopping-cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -41,9 +42,10 @@ import { ShoppingCartService } from '../../services/shopping-cart.service';
 })
 export class HomeComponent {
   authService = inject(AuthService);
+  router=inject(Router)
   productService = inject(ProductService);
   cartService=inject(ShoppingCartService)
-  //noOfCartItems$=this.cartService.noOfItemsInCart$
+  noOfCartItems$=this.cartService.noOfCartItems$
   products$ = this.productService.products$;
   filterChips$=this.productService.filterChips$
   currentUser$: Observable<UserAuth | null> = this.authService.currentUser$;
@@ -52,5 +54,9 @@ export class HomeComponent {
   }
   removeFilterChip(chip:string){
     this.productService.removeFilterChipsSubject.next(chip)
+  }
+  moveToCartPage(){
+    this.router.navigate(['cart'])
+
   }
 }

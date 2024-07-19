@@ -44,5 +44,6 @@ export interface CartProduct {
   avg_rating: number;
   discount: string;
   images: string[];
-  docReference:string
+  id:string,
+  quantity:number
 }
