@@ -63,7 +63,6 @@ export class SideNavComponent implements OnInit {
     );
   }
   handleCategorySelect(category: MatAutocompleteSelectedEvent) {
-    console.log(category);
     this.productService.selectCategorySubject.next(category.option.value);
   }
   handlePriceFilter(){
