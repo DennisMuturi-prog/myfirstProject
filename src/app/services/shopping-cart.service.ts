@@ -45,26 +45,32 @@ export class ShoppingCartService {
       }
     }),
     shareReplay(1),
-    tap((items) => console.log(items))
   );
   noOfCartItems$: Observable<number> = this.userFetchedCartItems$.pipe(
     map((items) => items.length)
   );
+  productsSet$:Observable<Map<string,Product>>=this.fetchedProducts$.pipe(
+    map((products)=>{
+      const productDetailsMap=new Map<string,Product>()
+       products.forEach((product) => {
+         productDetailsMap.set(product.pid, product);
+       });
+       return productDetailsMap
+    })
+  )
   cartDetails$: Observable<CartProduct[]> = this.userFetchedCartItems$.pipe(
-    combineLatestWith(this.fetchedProducts$),
+    combineLatestWith(this.productsSet$),
     map(([fetchedCart, fetchedProduct]) =>
       this.extractProductDetails(fetchedCart, fetchedProduct)
-    ),
-    tap((items) => console.log(items))
-  );
-  extractProductDetails(
+  ),
+  tap((items) => console.log(items))
+);
+extractProductDetails(
     fetchedItems: Cart[],
-    products: Product[]
+    productDetailsMap: Map<string,Product>
   ): CartProduct[] {
     return fetchedItems.map((itemCart) => {
-      let productDetails = products.find(
-        (currentProduct) => currentProduct.pid == itemCart.cartProductId
-      );
+     const productDetails = productDetailsMap.get(itemCart.cartProductId);
       if (productDetails) {
         return { ...productDetails, id: itemCart.id,quantity:1 };
       } else {
