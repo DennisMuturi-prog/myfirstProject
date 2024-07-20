@@ -17,6 +17,18 @@ export interface LoginUser{
     password:string
 
 }
+export interface ServerProduct {
+  title: string;
+  category: string;
+  price: number;
+  original_price: number;
+  pid: string;
+  return_policy: string;
+  brand: string;
+  avg_rating: number;
+  discount: string;
+  images: string[];
+}
 export interface Product{
     title:string,
     category:string,
@@ -27,7 +39,8 @@ export interface Product{
     brand:string,
     avg_rating:number,
     discount:string,
-    images:string[]
+    images:string[],
+    inCart:boolean
 }
 export interface Slidervalue{
     upper:number,
