@@ -6,6 +6,9 @@ import { CurrencyPipe } from '@angular/common';
 import { ProductImageComponent } from '../product-image/product-image.component';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
+import {toSignal} from '@angular/core/rxjs-interop'
+import { AddToCartComponent } from '../add-to-cart/add-to-cart.component';
+import { RemoveFromCartComponent } from '../remove-from-cart/remove-from-cart.component';
 
 @Component({
   selector: 'app-product',
@@ -15,23 +18,13 @@ import { ShoppingCartService } from '../../services/shopping-cart.service';
     MatButtonModule,
     CurrencyPipe,
     ProductImageComponent,
-    StarRatingComponent
+    StarRatingComponent,
+    AddToCartComponent,
+    RemoveFromCartComponent
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css',
 })
 export class ProductComponent {
   product=input.required<Product>();
-  alreadyBought=signal(false)
-  cartService=inject(ShoppingCartService)
-  buyItem():void{
-    if(this.alreadyBought()){
-      //this.cartService.removeFromCartSubject.next(this.product())
-      this.alreadyBought.set(false)
-    }
-    else{
-       //this.cartService.addToCartSubject.next(this.product());
-       this.alreadyBought.set(true)
-    }
-  }
 }
