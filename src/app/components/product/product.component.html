@@ -17,16 +17,12 @@
       <app-star-rating [averageRating]="product().avg_rating"></app-star-rating>
     </mat-card-content>
     <mat-card-actions>
-      <button 
-      (click)="buyItem()"
-      mat-raised-button>
-    @if(alreadyBought()){
-      remove from cart
-    }
-    @else {
-      buy
-    }
-    </button>
+      @if(product().inCart){
+        <app-remove-from-cart [productId]="product().pid"></app-remove-from-cart>
+      }
+      @else {
+        <app-add-to-cart [productId]="product().pid"></app-add-to-cart>
+      }
     </mat-card-actions>
     <mat-card-footer>
       <span>{{ product().discount}}</span>
