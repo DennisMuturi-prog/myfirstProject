@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { collection, collectionData } from '@angular/fire/firestore';
-import { Product, Slidervalue } from '../Types/Types';
+import { collection, collectionData,query,where } from '@angular/fire/firestore';
+import { Product, Slidervalue,ServerProduct } from '../Types/Types';
+import { Cart } from './shopping-cart.service';
 import {
   BehaviorSubject,
   map,
@@ -12,7 +13,8 @@ import {
   scan,
   Subject,
   tap,
-  combineLatestWith
+  combineLatestWith,
+  EMPTY
 } from 'rxjs';
 
 @Injectable({
@@ -20,12 +22,50 @@ import {
 })
 export class ProductService {
   authService = inject(AuthService);
-  fetchedProducts$ = this.getProducts();
+  currentUser$ = this.authService.currentUser$;
+  firestore = this.authService.firestore;
+  userFetchedCartItems$: Observable<Cart[]> = this.currentUser$.pipe(
+    switchMap((user) => {
+      if (user) {
+        return this.getCartItems(user?.userId);
+      } else {
+        return EMPTY;
+      }
+    }),
+    shareReplay(1)
+  );
+  fetchedCartSet$: Observable<Map<string, Cart>> =
+    this.userFetchedCartItems$.pipe(
+      map((cartGoods) => {
+        const cartGoodsMap = new Map<string, Cart>();
+        cartGoods.forEach((good) => {
+          cartGoodsMap.set(good.cartProductId, good);
+        });
+        return cartGoodsMap;
+      }),
+      shareReplay(1)
+    );
+  fetchedProducts$: Observable<Product[]> = this.getProducts().pipe(
+    //tap(items=>console.log(items)),
+    combineLatestWith(this.fetchedCartSet$),
+    //tap(([cart,good])=>console.log(good)),
+    map(([products, cartGoods]) =>
+      products.map((product) => ({
+        ...product,
+        inCart: cartGoods.has(product.pid),
+      }))
+    ),
+  );
+  getCartItems(userId: string): Observable<Cart[]> {
+    const collectionRef = collection(this.firestore, 'cartItems');
+    const userQuery = query(collectionRef, where('userId', '==', userId));
+    return collectionData(userQuery, { idField: 'id' });
+  }
   selectCategorySubject = new BehaviorSubject<string>('all');
   selectCategorySubject$ = this.selectCategorySubject
     .asObservable()
     .pipe(shareReplay(1));
-  selectCategoryAction$ = this.selectCategorySubject$
+  selectCategoryAction$ = this.selectCategorySubject$;
   priceRangeSubject = new BehaviorSubject<Slidervalue>({
     lower: 1,
     upper: 2000,
@@ -41,7 +81,7 @@ export class ProductService {
     this.fetchedProducts$.pipe(
       map((products) => {
         const productsByCategory = new Map<string, Product[]>();
-        productsByCategory.set('all',[...products])
+        productsByCategory.set('all', [...products]);
         products.forEach((product) => {
           if (!productsByCategory.has(product.category)) {
             productsByCategory.set(product.category, [product]);
@@ -52,12 +92,12 @@ export class ProductService {
         return productsByCategory;
       })
     );
-  getProducts(): Observable<Product[]> {
+  getProducts(): Observable<ServerProduct[]> {
     const productCollection = collection(
       this.authService.firestore,
       'products'
     );
-    return collectionData<Product[]>(productCollection);
+    return collectionData<ServerProduct[]>(productCollection);
   }
   categoryHandler(category: string) {
     if (category == '' || category == 'all') {
@@ -94,7 +134,9 @@ export class ProductService {
 
   categoryProducts$ = this.selectCategoryAction$.pipe(
     combineLatestWith(this.productsByCategory$),
-    map(([category,productsWithCategory])=>productsWithCategory.get(category))
+    map(([category, productsWithCategory]) =>
+      productsWithCategory.get(category)
+    ),
   );
   priceProducts$ = this.priceRangeAction$.pipe(
     switchMap((changeFunction) => {
@@ -108,7 +150,7 @@ export class ProductService {
       return this.priceProducts$.pipe(
         map((products) => changeFunction(products))
       );
-    })
+    }),
   );
   chipsHandler(value: Slidervalue) {
     if (value.lower == 1 && value.upper == 2000) {
@@ -129,7 +171,7 @@ export class ProductService {
     ];
   }
   chipsCategory(value: string) {
-    if (value=='all') {
+    if (value == 'all') {
       return (state: string[]) => state;
     }
     return (state: string[]) => [
