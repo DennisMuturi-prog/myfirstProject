@@ -2,22 +2,20 @@ import { inject, Injectable } from '@angular/core';
 import {
   combineLatestWith,
   EMPTY,
-  shareReplay,
+  scan,
   Subject,
   switchMap,
+  merge,
 } from 'rxjs';
 import { CartProduct, Product } from '../Types/Types';
-import { map, tap, Observable,from } from 'rxjs';
+import { map, tap, Observable, from } from 'rxjs';
 import { AuthService } from './auth.service';
 import {
   collection,
-  collectionData,
-  query,
-  where,
   doc,
   deleteDoc,
   addDoc,
-  DocumentReference
+  DocumentReference,
 } from '@angular/fire/firestore';
 import { ProductService } from './product.service';
 
@@ -25,6 +23,10 @@ export interface Cart {
   cartProductId: string;
   userId: string;
   id: string;
+}
+export interface QuantityAction {
+  productId: string;
+  action: string;
 }
 @Injectable({
   providedIn: 'root',
@@ -113,7 +115,10 @@ export class ShoppingCartService {
   deleteCartItem(id: string) {
     return from(deleteDoc(doc(this.firestore, 'cartItems', id)));
   }
-  addCartItem(productId: string, userId: string):Observable<DocumentReference> {
+  addCartItem(
+    productId: string,
+    userId: string
+  ): Observable<DocumentReference> {
     return from(
       addDoc(collection(this.firestore, 'cartItems'), {
         cartProductId: productId,
@@ -121,6 +126,28 @@ export class ShoppingCartService {
       })
     );
   }
-
+  changeQuantitySubject = new Subject<QuantityAction>();
+  changeQuantityAction$ = this.changeQuantitySubject.asObservable();
+  cartWithQuantityChanging$:Observable<CartProduct[]> = merge(
+    this.cartDetails$.pipe(map(this.addHandler)),
+    this.changeQuantityAction$.pipe(map(this.changeHadler))
+  ).pipe(scan((state: CartProduct[], stateHandler) => stateHandler(state), []));
+  addHandler(products: CartProduct[]) {
+    return (state: CartProduct[]) => [...products];
+  }
+  changeHadler(quantityAction: QuantityAction) {
+    return (state: CartProduct[]) =>
+      state.map((good) => {
+        if (good.pid == quantityAction.productId) {
+          if (quantityAction.action == 'increase') {
+            return { ...good, quantity: good.quantity + 1 };
+          } else{
+            return { ...good, quantity: good.quantity - 1 };
+          } 
+        } else {
+          return good;
+        }
+      });
+  }
   constructor() {}
 }
