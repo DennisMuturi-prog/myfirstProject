@@ -1,0 +1,10 @@
+mat-card{
+    color: white;
+}
+.quantity{
+    display: flex;
+    align-items: center;
+}
+mat-card-title{
+    width: 400px;
+}
