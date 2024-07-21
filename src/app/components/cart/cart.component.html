@@ -1,8 +1,50 @@
-<table mat-table [dataSource]="cartItems$">
-  <mat-text-column name="title"></mat-text-column>
-  <mat-text-column name="brand"></mat-text-column>
-  <mat-text-column name="quantity"></mat-text-column>
-  <mat-text-column name="price"></mat-text-column>
-  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-  <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
-</table>
+<mat-toolbar>
+  <button (click)="goToHome()" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1>Cart</h1>
+</mat-toolbar>
+<mat-sidenav-container>
+  <mat-sidenav opened mode="side" position="end">
+    <table class="cartTable"  mat-table [dataSource]="cartItems$">
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let item">{{ item.title }}</td>
+        <td mat-footer-cell *matFooterCellDef>Total:{{totalCost$ | async | currency}}</td>
+      </ng-container>
+      <ng-container matColumnDef="totalPrice">
+        <th mat-header-cell *matHeaderCellDef>TotalPrice</th>
+        <td mat-cell *matCellDef="let item">
+          {{ item.price * item.quantity }}
+        </td>
+         <td mat-footer-cell *matFooterCellDef>Total:{{totalCost$ | async | currency}}</td>
+      </ng-container>
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Unit Price</th>
+        <td mat-cell *matCellDef="let item">{{ item.price}}</td>
+         <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+      <ng-container matColumnDef="quantity">
+        <th mat-header-cell *matHeaderCellDef>Quantity</th>
+        <td mat-cell *matCellDef="let item">{{ item.quantity}}</td>
+         <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+      <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
+    </table>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    @if(cartItems$ | async ;as cartItems){ @if(cartItems.length>0){
+      <h3>Total Cart:{{totalCost$ | async | currency}}</h3>
+    @for(cartItem of cartItems;track cartItem.pid){
+    <app-cart-item [productDetails]="cartItem"></app-cart-item>
+    <mat-divider></mat-divider>
+    }} @else {
+    <p>No items in cart</p>
+    <a mat-raised-button routerLink="/home">go back to home</a>
+    } } @else {
+    <mat-spinner></mat-spinner>
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>
