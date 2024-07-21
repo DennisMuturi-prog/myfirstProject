@@ -1,4 +1,6 @@
-
+mat-sidenav{
+    width: 450px;
+}
 .cartTable{
     width: 100%;
 }
@@ -13,4 +15,14 @@
 }
 .mat-column-title{
     width: 100px;
+}
+h3{
+    color: #00dddd;
+}
+h3>span{
+    color: white;
+}
+.cartGoods{
+    display: flex;
+    flex-wrap: wrap;
 }
