@@ -1,0 +1,49 @@
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+/>
+<mat-card class="cartItem">
+  <mat-card-header>
+    <mat-card-title>
+      {{ productDetails().title }}
+    </mat-card-title>
+    <mat-card-subtitle>{{ productDetails().brand }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <app-product-image
+      [productImagesUrls]="productDetails().images"
+    ></app-product-image>
+    <mat-card
+      ><mat-card-content
+        ><span>unit price:</span
+        >{{ productDetails().price | currency }}</mat-card-content
+      ></mat-card
+    >
+    <mat-card
+      ><mat-card-content class="quantity"
+        ><span>Quantity:</span>{{ productDetails().quantity }}
+        <button (click)="increaseQuantity()" mat-icon-button>
+          <mat-icon>add</mat-icon>
+        </button>
+        @if(productDetails().quantity>1){
+        <button (click)="decreaseQuantity()" mat-icon-button>
+          <mat-icon>remove</mat-icon>
+        </button>
+        }
+      </mat-card-content></mat-card
+    >
+    <mat-card
+      ><mat-card-content
+        ><span>TotalForThisProduct:</span
+        >{{ productTotalPrice() | currency }}</mat-card-content
+      ></mat-card
+    >
+  </mat-card-content>
+  <mat-card-actions>
+    <button 
+    (click)="removeFromCart()"
+    mat-icon-button>
+      <span class="material-symbols-outlined">remove_shopping_cart</span>
+    </button>
+  </mat-card-actions>
+</mat-card>
