@@ -1,0 +1,16 @@
+
+.cartTable{
+    width: 100%;
+}
+.mat-column-price{
+    width: 32px;
+}
+.mat-column-quantity{
+    width: 32px;
+}
+.mat-column-totalPrice{
+    width: 32px;
+}
+.mat-column-title{
+    width: 100px;
+}
