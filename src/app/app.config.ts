@@ -7,12 +7,14 @@ import {provideStorage,getStorage} from '@angular/fire/storage'
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideAnimationsAsync(),
     provideFirebaseApp(()=>initializeApp(environment.firebase)),
     provideFirestore(()=>getFirestore()),
     provideAuth(()=>getAuth()),
-    provideStorage(()=>getStorage())
+    provideStorage(()=>getStorage()),
+    provideHttpClient(withFetch())
   ]
 };
