@@ -1,4 +1,117 @@
 <mat-toolbar>
-    <a routerLink="/home">Home</a>
-    <a routerLink="/cart">Cart</a>
+  <a routerLink="/home">Home</a>
+  <a routerLink="/cart">Cart</a>
 </mat-toolbar>
+<form [formGroup]="checkOutForm">
+  <mat-stepper linear>
+    <mat-step [stepControl]="address" label="Address details">
+      <div formGroupName="address">
+        <h2>Address</h2>
+        <div>
+          <mat-form-field>
+            <mat-label>Street</mat-label>
+            <input matInput type="text" formControlName="street" />
+            <mat-hint>Enter your street</mat-hint>
+            @if(street?.invalid&&(street?.touched)){
+            @if(street?.hasError('required')){
+            <mat-error>street is required</mat-error>
+            } }
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <mat-label>Your county</mat-label>
+            <mat-select formControlName="county">
+              <mat-option value="Kiambu">Kiambu</mat-option>
+              <mat-option value="Nairobi">Nairobi</mat-option>
+              <mat-option value="Nakuru">Nakuru</mat-option>
+            </mat-select>
+            <mat-hint>Enter your county</mat-hint>
+            @if(county?.invalid&&(county?.touched)){
+            @if(county?.hasError('required')){
+            <mat-error>County is required</mat-error>
+            } }
+          </mat-form-field>
+        </div>
+        @if(cities$ | async;as cities){
+        <div>
+          <mat-form-field>
+            <mat-label>Your city</mat-label>
+            <mat-select formControlName="city">
+                @for(city of cities;track city[0]){
+                    <mat-option [value]="city">{{city}}</mat-option>
+                }
+            </mat-select>
+            <mat-hint>Enter city</mat-hint>
+            @if(city?.invalid&&(city?.touched)){
+            @if(city?.hasError('required')){
+            <mat-error>City is required</mat-error>
+            } }
+          </mat-form-field>
+        </div>
+        }
+
+        <div>
+          <mat-form-field>
+            <mat-label>Zip code</mat-label>
+            <input matInput type="text" formControlName="zip" />
+            <mat-hint>Enter your zip code</mat-hint>
+            @if(zip?.invalid&&(zip?.touched)){ @if(zip?.hasError('required')){
+            <mat-error>street is required</mat-error>
+            } }
+          </mat-form-field>
+        </div>
+      </div>
+      <div><button mat-button matStepperNext type="button">Next</button></div>
+    </mat-step>
+    <mat-step label="Delivery Mechanism" [stepControl]="deliveryForm">
+      <div formGroupName="deliveryForm">
+        <div class="deliveryDiv">
+          <mat-label>Delivery Method</mat-label>
+          <mat-radio-group
+            aria-label="Select your delivery method"
+            formControlName="typeOfDelivery"
+          >
+            <mat-radio-button value="home">To your home</mat-radio-button>
+            <mat-radio-button value="pickup"
+              >Our nearest pickup point</mat-radio-button
+            >
+          </mat-radio-group>
+          @if(typeOfDelivery?.invalid&&(typeOfDelivery?.touched)){
+          @if(typeOfDelivery?.hasError('required')){
+          <mat-error>Your preffered delivery method is required</mat-error>
+          } }
+        </div>
+      </div>
+      <div>
+        <button mat-button matStepperPrevious type="button">back</button>
+        <button mat-button matStepperNext type="button">next</button>
+      </div>
+    </mat-step>
+    <mat-step label="payment Option">
+        <div formGroupName="paymentForm">
+        <div class="paymentDiv">
+          <mat-label>Delivery Method</mat-label>
+          <mat-radio-group
+            aria-label="Select your payment method"
+            formControlName="modeOfPayment"
+          >
+            <mat-radio-button value="Mpesa">Mpesa</mat-radio-button>
+            <mat-radio-button value="Credit card"
+              >Credit Card</mat-radio-button
+            >
+          </mat-radio-group>
+          @if(modeOfPayment?.invalid&&(modeOfPayment?.touched)){
+          @if(modeOfPayment?.hasError('required')){
+          <mat-error>Your preffered payment method is required</mat-error>
+          } }
+        </div>
+      </div>
+      <div>
+        <button mat-button matStepperPrevious type="button">Back</button>
+        <button mat-raised-button>Submit</button>
+    </div>
+    </mat-step>
+    
+  </mat-stepper>
+</form>
