@@ -2,8 +2,8 @@
   <a routerLink="/home">Home</a>
   <a routerLink="/cart">Cart</a>
 </mat-toolbar>
-<form [formGroup]="checkOutForm">
-  <mat-stepper linear>
+<form [formGroup]="checkOutForm" (ngSubmit)="checkOutForm.valid?onSubmit():openErrorMessage()">
+  <mat-stepper>
     <mat-step [stepControl]="address" label="Address details">
       <div formGroupName="address">
         <h2>Address</h2>
@@ -96,9 +96,9 @@
             aria-label="Select your payment method"
             formControlName="modeOfPayment"
           >
-            <mat-radio-button value="Mpesa">Mpesa</mat-radio-button>
+            <mat-radio-button value="Mpesa"><img src="mpesa.png"/></mat-radio-button>
             <mat-radio-button value="Credit card"
-              >Credit Card</mat-radio-button
+              ><img src="paypal.svg" alt=""/><img src="visa.svg" alt=""/><img src="mastercard.svg" alt=""/></mat-radio-button
             >
           </mat-radio-group>
           @if(modeOfPayment?.invalid&&(modeOfPayment?.touched)){
@@ -109,9 +109,8 @@
       </div>
       <div>
         <button mat-button matStepperPrevious type="button">Back</button>
-        <button mat-raised-button>Submit</button>
+        <button mat-raised-button>Pay</button>
     </div>
-    </mat-step>
-    
+    </mat-step> 
   </mat-stepper>
 </form>
