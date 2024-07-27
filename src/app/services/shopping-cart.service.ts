@@ -6,6 +6,7 @@ import {
   Subject,
   switchMap,
   merge,
+  shareReplay,
 } from 'rxjs';
 import { CartProduct, Product } from '../Types/Types';
 import { map, tap, Observable, from } from 'rxjs';
@@ -128,10 +129,13 @@ export class ShoppingCartService {
   }
   changeQuantitySubject = new Subject<QuantityAction>();
   changeQuantityAction$ = this.changeQuantitySubject.asObservable();
-  cartWithQuantityChanging$:Observable<CartProduct[]> = merge(
+  cartWithQuantityChanging$: Observable<CartProduct[]> = merge(
     this.cartDetails$.pipe(map(this.addHandler)),
     this.changeQuantityAction$.pipe(map(this.changeHadler))
-  ).pipe(scan((state: CartProduct[], stateHandler) => stateHandler(state), []));
+  ).pipe(
+    scan((state: CartProduct[], stateHandler) => stateHandler(state), []),
+    shareReplay(1)
+  );
   addHandler(products: CartProduct[]) {
     return (state: CartProduct[]) => [...products];
   }
@@ -141,9 +145,9 @@ export class ShoppingCartService {
         if (good.pid == quantityAction.productId) {
           if (quantityAction.action == 'increase') {
             return { ...good, quantity: good.quantity + 1 };
-          } else{
+          } else {
             return { ...good, quantity: good.quantity - 1 };
-          } 
+          }
         } else {
           return good;
         }
