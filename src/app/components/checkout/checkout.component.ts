@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,8 @@ import { addressMap } from './address';
 import { MatSelectModule } from '@angular/material/select';
 import { map, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { CheckoutService } from '../../services/checkout.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-checkout',
@@ -31,6 +33,8 @@ import { AsyncPipe } from '@angular/common';
   styleUrl: './checkout.component.css',
 })
 export class CheckoutComponent {
+  checkoutService=inject(CheckoutService)
+  createOrder$=this.checkoutService.createOrder$.pipe(takeUntilDestroyed())
   myAddressMap = addressMap;
   checkOutForm = new FormGroup({
     address: new FormGroup({
@@ -79,5 +83,23 @@ export class CheckoutComponent {
         countyName ? this.myAddressMap.get(countyName) : ['Ex']
       )
     );
-  onSubmit() {}
+  onSubmit() {
+    console.log(this.checkOutForm.value);
+    const {address,deliveryForm,paymentForm}=this.checkOutForm.value
+    if(address&&deliveryForm&&paymentForm){
+      const {zip,county,city,street}=address
+      const {typeOfDelivery}=deliveryForm
+      const {modeOfPayment}=paymentForm
+      if(zip&&county&&city&&street&&typeOfDelivery&&modeOfPayment){
+        const addressInfo={zip,county,street,city}
+        const deliveryMethod=typeOfDelivery
+        this.createOrder$.subscribe()
+        this.checkoutService.orderGoods.next({addressInfo,deliveryMethod,modeOfPayment})
+      }
+    }
+    
+      
+  }
+  openErrorMessage(){
+  }
 }
