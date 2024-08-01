@@ -105,6 +105,7 @@ export class CheckoutService {
         orderItems: products,
         paid: false,
         delivery,
+        orderDate:new Date()
       })
     );
   }
