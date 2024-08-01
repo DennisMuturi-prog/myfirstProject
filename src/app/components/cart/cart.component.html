@@ -38,7 +38,7 @@
   <mat-sidenav-content>
     @if(cartItems$ | async ;as cartItems){ @if(cartItems.length>0){
       <h3><span>Total Cart:</span>{{totalCost$ | async | currency}}</h3>
-       <a mat-raised-button routerLink="/checkout">Proceed To checkout</a>
+       <a mat-flat-button routerLink="/checkout">Proceed To checkout</a>
 
     <div class="cartGoods">
       @for(cartItem of cartItems;track cartItem.pid){
