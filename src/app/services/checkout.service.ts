@@ -16,6 +16,7 @@ import {
   switchMap,
   of,
   tap,
+  take,
 } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ShoppingCartService } from './shopping-cart.service';
@@ -23,6 +24,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MpesaPaymentDialogComponent } from '../components/mpesa-payment-dialog/mpesa-payment-dialog.component';
+import { environment } from '../../environments/environment';
 
 interface Order {
   productId: string;
@@ -63,37 +65,89 @@ export class CheckoutService {
   currentUser$ = this.authService.currentUser$;
   orderGoods = new Subject<OrderDetails>();
   orderGoodsAction$ = this.orderGoods.asObservable();
-  createOrder$ = this.currentUser$.pipe(
-    combineLatestWith(this.cart$, this.orderGoodsAction$,this.totalPrice$),
-    switchMap(([user, cartGoods, orderDetails,totalPrice]) => {
+  // createOrder$ = this.currentUser$.pipe(
+  //   combineLatestWith(this.cart$, this.orderGoodsAction$,this.totalPrice$),
+  //   switchMap(([user, cartGoods, orderDetails,totalPrice]) => {
+  //     if (user) {
+  //       let myOrder: Order[] = cartGoods.map((good) => ({
+  //         productId: good.pid,
+  //         quantity: good.quantity,
+  //       }));
+  //       return this.addOrderItems(
+  //         myOrder,
+  //         user.userId,
+  //         orderDetails.deliveryMethod
+  //       ).pipe(
+  //         tap((ref) => console.log(ref)),
+  //         switchMap((orderRef) => {
+  //           if (orderDetails.modeOfPayment == 'Credit card') {
+  //             return this.initiateStripePayment(orderRef.id);
+  //           } else {
+  //             this.openDialog(orderRef.id,totalPrice);
+  //             return of('no action');
+  //           }
+  //         }),
+  //         switchMap(() =>
+  //           this.saveUsershippingInfo(orderDetails.addressInfo, user.userId)
+  //         )
+  //       );
+  //     } else {
+  //       return EMPTY;
+  //     }
+  //   })
+  // );
+
+  createOrder(orderDetails: OrderDetails): Observable<any> {
+  return this.currentUser$.pipe(
+    take(1), // ✅ Only take one emission
+    combineLatestWith(
+      this.cart$.pipe(take(1)), 
+      this.totalPrice$.pipe(take(1))
+    ),
+    switchMap(([user, cartGoods, totalPrice]) => {
       if (user) {
-        let myOrder: Order[] = cartGoods.map((good) => ({
+        const myOrder: Order[] = cartGoods.map((good) => ({
           productId: good.pid,
           quantity: good.quantity,
         }));
-        return this.addOrderItems(
-          myOrder,
-          user.userId,
-          orderDetails.deliveryMethod
-        ).pipe(
+        
+        return this.addOrderItems(myOrder, user.userId, orderDetails.deliveryMethod).pipe(
           tap((ref) => console.log(ref)),
           switchMap((orderRef) => {
-            if (orderDetails.modeOfPayment == 'Credit card') {
+            if (orderDetails.modeOfPayment === 'Credit card') {
               return this.initiateStripePayment(orderRef.id);
             } else {
-              this.openDialog(orderRef.id,totalPrice);
-              return of('no action');
+              this.openDialog(orderRef.id, totalPrice);
+              return of('mpesa-initiated');
             }
           }),
-          switchMap(() =>
-            this.saveUsershippingInfo(orderDetails.addressInfo, user.userId)
-          )
+          switchMap(() => this.saveUsershippingInfo(orderDetails.addressInfo, user.userId))
         );
       } else {
         return EMPTY;
       }
     })
   );
+}
+
+private isDialogOpen = false;
+
+openDialog(orderId: string, totalPrice: number): void {
+  if (this.isDialogOpen) return;
+  
+  this.isDialogOpen = true;
+  const dialogRef = this.dialog.open(MpesaPaymentDialogComponent, {
+    data: { orderId, totalPrice },
+    width: '500px',
+    height: '400px'
+  });
+  
+  dialogRef.afterClosed().subscribe(() => {
+    this.isDialogOpen = false;
+  });
+}
+
+
   addOrderItems(
     products: Order[],
     userId: string,
@@ -128,19 +182,19 @@ export class CheckoutService {
   }
   initiateStripePayment(orderId: string):Observable<StripeUrl> {
     return this.http
-      .post<StripeResponse>('http://localhost:3000/stripePayment', { orderId })
+      .post<StripeResponse>(`${environment.apiUrl}/stripePayment`, { orderId })
       .pipe(tap((res: StripeUrl) => (window.location.href = res.url)));
   }
-  openDialog(orderId: string,totalPrice:number): void {
-    this.dialog.open(MpesaPaymentDialogComponent, {
-      data:{orderId,totalPrice},
-      width: '500px',
-      height:'400px'
-    });
-  }
+  // openDialog(orderId: string,totalPrice:number): void {
+  //   this.dialog.open(MpesaPaymentDialogComponent, {
+  //     data:{orderId,totalPrice},
+  //     width: '500px',
+  //     height:'400px'
+  //   });
+  // }
   initiateMpesaPayment(orderId:string,phoneNumber:string){
     return this.http
-      .post('http://localhost:3000/mpesa', {orderId,phoneNumber })
+      .post(`${environment.apiUrl}/mpesa`, {orderId,phoneNumber })
       .pipe(tap(() => this.router.navigate(['home'])));
 
   }

@@ -12,7 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { map, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CheckoutService } from '../../services/checkout.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-checkout',
@@ -27,15 +27,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatStepperModule,
     MatRadioModule,
     MatSelectModule,
-    AsyncPipe
+    AsyncPipe,
+    MatProgressSpinnerModule
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.css',
 })
 export class CheckoutComponent {
   checkoutService=inject(CheckoutService)
-  createOrder$=this.checkoutService.createOrder$.pipe(takeUntilDestroyed())
   myAddressMap = addressMap;
+  isProcessingPayment = false;
   checkOutForm = new FormGroup({
     address: new FormGroup({
       street: new FormControl('', Validators.required),
@@ -77,6 +78,22 @@ export class CheckoutComponent {
   get modeOfPayment() {
     return this.checkOutForm.get('paymentForm.modeOfPayment');
   }
+    get isCreditCardSelected(): boolean {
+    return this.modeOfPayment?.value === 'Credit card';
+  }
+
+  // Helper method to check if button should be disabled
+  get isPayButtonDisabled(): boolean {
+    return this.isProcessingPayment || !this.checkOutForm.valid;
+  }
+
+  // Get payment button text
+  get payButtonText(): string {
+    if (this.isProcessingPayment) {
+      return this.isCreditCardSelected ? 'Redirecting to Payment...' : 'Processing...';
+    }
+    return 'Pay';
+  }
   cities$: Observable<string[] | undefined> | undefined =
     this.county?.valueChanges.pipe(
       map((countyName) =>
@@ -93,13 +110,25 @@ export class CheckoutComponent {
       if(zip&&county&&city&&street&&typeOfDelivery&&modeOfPayment){
         const addressInfo={zip,county,street,city}
         const deliveryMethod=typeOfDelivery
-        this.createOrder$.subscribe()
-        this.checkoutService.orderGoods.next({addressInfo,deliveryMethod,modeOfPayment})
+        const orderDetails = { addressInfo, deliveryMethod, modeOfPayment };
+        this.isProcessingPayment = true;
+
+        this.checkoutService.createOrder(orderDetails).subscribe({
+        next: (result) => {
+          console.log('Order created successfully:', result);
+          this.isProcessingPayment = false;
+        },
+        error: (error) => {
+          console.error('Order creation failed:', error);
+          this.isProcessingPayment = false;
+        }
+      });
       }
     }
     
       
   }
   openErrorMessage(){
+    console.log('Form has validation errors');
   }
 }

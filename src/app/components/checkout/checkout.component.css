@@ -1,0 +1,54 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.button-container button {
+  min-width: 120px;
+}
+
+/* Disable pointer events when processing */
+form:has(.loading-container) {
+  pointer-events: none;
+}
+
+form:has(.loading-container) .button-container {
+  pointer-events: auto;
+}
+
+/* Payment method styling */
+.paymentDiv {
+  margin: 16px 0;
+}
+
+.paymentDiv mat-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.paymentDiv mat-radio-button {
+  display: flex;
+  align-items: center;
+}
+
+.paymentDiv img {
+  height: 30px;
+  margin-left: 8px;
+}

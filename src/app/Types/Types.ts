@@ -18,11 +18,11 @@ export interface UserDocument {
   marketingSource: string;
   secondName: string;
 }
-export interface UserAuth{
-    userName:string,
-    email:string,
-    userId:string,
-    profileImageUrl:string,
+export interface UserAuth {
+    userName: string | null;  // Allow null since displayName can be null
+    email: string | null;     // Allow null since email can be null
+    userId: string;
+    profileImageUrl?: string | null; // Make optional and allow null
 }
 export interface LoginUser{
     email:string,

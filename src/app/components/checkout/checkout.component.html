@@ -107,10 +107,31 @@
           } }
         </div>
       </div>
-      <div>
-        <button mat-button matStepperPrevious type="button">Back</button>
-        <button mat-raised-button>Pay</button>
-    </div>
+      @if(isProcessingPayment && isCreditCardSelected) {
+        <div class="loading-container">
+          <mat-spinner diameter="30"></mat-spinner>
+          <p>Redirecting to secure payment gateway...</p>
+        </div>
+      }
+
+      <div class="button-container">
+        <button mat-button matStepperPrevious type="button" [disabled]="isProcessingPayment">
+          Back
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary"
+          type="submit"
+          [disabled]="isPayButtonDisabled">
+          
+          @if(isProcessingPayment) {
+            <mat-spinner diameter="20" style="margin-right: 8px;"></mat-spinner>
+          }
+          
+          {{ payButtonText }}
+        </button>
+      </div>
     </mat-step> 
   </mat-stepper>
 </form>

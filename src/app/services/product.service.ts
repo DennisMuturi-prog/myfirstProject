@@ -60,7 +60,7 @@ export class ProductService {
   getCartItems(userId: string): Observable<Cart[]> {
     const collectionRef = collection(this.firestore, 'cartItems');
     const userQuery = query(collectionRef, where('userId', '==', userId));
-    return collectionData(userQuery, { idField: 'id' });
+    return collectionData(userQuery, { idField: 'id' }) as Observable<Cart[]>;;
   }
   selectCategorySubject = new BehaviorSubject<string>('all');
   selectCategorySubject$ = this.selectCategorySubject
@@ -98,7 +98,7 @@ export class ProductService {
       this.authService.firestore,
       'products'
     );
-    return collectionData<ServerProduct[]>(productCollection);
+    return collectionData(productCollection) as Observable<ServerProduct[]>;;
   }
   categoryHandler(category: string) {
     if (category == '' || category == 'all') {

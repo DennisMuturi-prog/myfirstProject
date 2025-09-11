@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,updateProfile, User, user, UserCredential } from '@angular/fire/auth';
-import { Firestore,doc,docData,setDoc } from '@angular/fire/firestore';
+import { DocumentData, Firestore,doc,docData,setDoc } from '@angular/fire/firestore';
 import { map, from, switchMap, catchError,Observable ,throwError,tap, of} from 'rxjs';
 import { LoginUser, RegisterUser, UserAuth, UserDocument} from '../Types/Types';
 import { Router } from '@angular/router';
@@ -29,17 +29,17 @@ export class AuthService {
         // Fetch additional user data including profile image
         const userDocRef = doc(this.firestore, `users/${uid}`);
         return docData(userDocRef).pipe(
-          map((userData: UserDocument) => ({
+          map((userData: DocumentData | undefined) => ({
             userName: displayName,
             email,
             userId: uid,
-            profileImageUrl: userData.imageUrl
+            profileImageUrl: userData?.['imageUrl'] || null
           })),
           catchError(() => of({
             userName: displayName,
             email,
             userId: uid,
-            profileImageUrl: ""
+            profileImageUrl: null
           }))
         );
       } else {
