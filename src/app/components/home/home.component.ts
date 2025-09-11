@@ -59,4 +59,11 @@ export class HomeComponent {
     this.router.navigate(['cart'])
 
   }
+  login() {
+    this.router.navigate(['signin']);
+  }
+
+  navigateToProfile() {
+    this.router.navigate(['profile']); // or wherever your profile page is
+  }
 }

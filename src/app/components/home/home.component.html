@@ -1,20 +1,41 @@
 <mat-toolbar>
     <mat-toolbar-row>
-        <button
-        (click)="sidenav.toggle()"
-        mat-icon-button>
-            <mat-icon>menu</mat-icon>
-        </button>
-        <button mat-icon-button>
-            <mat-icon>favorite</mat-icon>
-        </button>
-         <button
-         (click)="moveToCartPage()" 
-         mat-icon-button>
-            <mat-icon [matBadge]="noOfCartItems$ | async">shopping_cart</mat-icon>
-        </button>
-        <button mat-flat-button
-        (click)="logout()" >Log out</button>
+        <div class="left-buttons">
+            <button
+            (click)="sidenav.toggle()"
+            mat-icon-button>
+                <mat-icon>menu</mat-icon>
+            </button>
+            <button mat-icon-button>
+                <mat-icon>favorite</mat-icon>
+            </button>
+             <button
+             (click)="moveToCartPage()" 
+             mat-icon-button>
+                <mat-icon [matBadge]="noOfCartItems$ | async">shopping_cart</mat-icon>
+            </button>
+        </div>
+
+        <!-- Profile section aligned to the right -->
+        <div class="profile-section">
+            @if(currentUser$ | async; as user) {
+                <!-- Show profile image if available -->
+                @if(user.profileImageUrl) {
+                    <img 
+                        [src]="user.profileImageUrl" 
+                        alt="Profile" 
+                        class="profile-image"
+                        (click)="navigateToProfile()"/>
+                } @else {
+                    <button mat-icon-button (click)="navigateToProfile()">
+                        <mat-icon>account_circle</mat-icon>
+                    </button>
+                }
+                <button mat-flat-button (click)="logout()">Log out</button>
+            } @else {
+                <button mat-flat-button (click)="login()">Login</button>
+            }
+        </div>
     </mat-toolbar-row>
  <mat-toolbar-row>
      <app-search></app-search>

@@ -14,7 +14,8 @@ import {
   Subject,
   tap,
   combineLatestWith,
-  EMPTY
+  EMPTY,
+  of
 } from 'rxjs';
 
 @Injectable({
@@ -29,7 +30,7 @@ export class ProductService {
       if (user) {
         return this.getCartItems(user?.userId);
       } else {
-        return EMPTY;
+        return of([]);
       }
     }),
     shareReplay(1)
@@ -46,7 +47,7 @@ export class ProductService {
       shareReplay(1)
     );
   fetchedProducts$: Observable<Product[]> = this.getProducts().pipe(
-    //tap(items=>console.log(items)),
+    tap(items=>console.log(items)),
     combineLatestWith(this.fetchedCartSet$),
     //tap(([cart,good])=>console.log(good)),
     map(([products, cartGoods]) =>

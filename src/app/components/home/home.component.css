@@ -1,3 +1,4 @@
+
 .allProducts{
     display: flex;
     justify-content: center;
@@ -5,3 +6,32 @@
     min-height: 80vh;
 }
 
+/* Toolbar row styling */
+mat-toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Profile section styling */
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto; /* This pushes the section to the right */
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.user-info {
+    padding: 16px;
+    background-color: #f5f5f5;
+    margin: 16px;
+    border-radius: 8px;
+}

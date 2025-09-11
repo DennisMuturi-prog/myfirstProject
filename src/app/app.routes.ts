@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 export const routes: Routes = [
   { path: 'signup', component: SignupComponent, title: 'sign up' },
@@ -18,4 +19,5 @@ export const routes: Routes = [
   { path: 'cart', component: CartComponent, title: 'cart' },
   { path: 'checkout', component: CheckoutComponent, title: 'checkout' },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
+  {path:'profile', component:ProfileComponent,title :'profile'}
 ];

@@ -1,3 +1,5 @@
+import { Timestamp } from "@angular/fire/firestore";
+
 export interface RegisterUser{
     firstName:string,
     secondName:string,
@@ -7,10 +9,20 @@ export interface RegisterUser{
     gender:string,
     marketingSource:string,
 }
+
+export interface UserDocument {
+  dateOfBirth: Timestamp;
+  firstName: string;
+  gender: string;
+  imageUrl: string;
+  marketingSource: string;
+  secondName: string;
+}
 export interface UserAuth{
     userName:string,
     email:string,
-    userId:string
+    userId:string,
+    profileImageUrl:string,
 }
 export interface LoginUser{
     email:string,
