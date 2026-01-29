@@ -47,7 +47,6 @@ export class ProductService {
       shareReplay(1)
     );
   fetchedProducts$: Observable<Product[]> = this.getProducts().pipe(
-    tap(items=>console.log(items)),
     combineLatestWith(this.fetchedCartSet$),
     //tap(([cart,good])=>console.log(good)),
     map(([products, cartGoods]) =>
