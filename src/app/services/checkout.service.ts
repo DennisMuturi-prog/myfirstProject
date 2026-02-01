@@ -17,6 +17,7 @@ import {
   of,
   tap,
   take,
+  catchError,
 } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ShoppingCartService } from './shopping-cart.service';
@@ -195,7 +196,9 @@ openDialog(orderId: string, totalPrice: number): void {
   initiateMpesaPayment(orderId:string,phoneNumber:string){
     return this.http
       .post(`${environment.apiUrl}/mpesa`, {orderId,phoneNumber })
-      .pipe(tap(() => this.router.navigate(['home'])));
+      .pipe(
+        tap(() => this.router.navigate(['home'])),
+    );
 
   }
 

@@ -19,6 +19,7 @@ import {
   DocumentReference,
 } from '@angular/fire/firestore';
 import { ProductService } from './product.service';
+import { Router } from '@angular/router';
 
 export interface Cart {
   cartProductId: string;
@@ -33,6 +34,7 @@ export interface QuantityAction {
   providedIn: 'root',
 })
 export class ShoppingCartService {
+  router = inject(Router);
   authService = inject(AuthService);
   productService = inject(ProductService);
   firestore = this.authService.firestore;
@@ -97,6 +99,7 @@ export class ShoppingCartService {
       if (docRef) {
         return this.deleteCartItem(docRef.id);
       } else {
+        this.router.navigate(['home'])
         return EMPTY;
       }
     }),
@@ -108,6 +111,7 @@ export class ShoppingCartService {
       if (user) {
         return this.addCartItem(productId, user.userId);
       } else {
+        this.router.navigate(['home'])
         return EMPTY;
       }
     }),

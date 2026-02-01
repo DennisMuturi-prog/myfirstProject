@@ -9,7 +9,11 @@
                 @if(phoneNumber.invalid&&(phoneNumber.touched)){
                 @if(phoneNumber.hasError('required')){
                 <mat-error>mpesa number is required</mat-error>
-                } }
+                }
+                @if(phoneNumber.hasError('pattern')){
+                <mat-error>invalid kenyan phone number.Example:0712 345 567</mat-error>
+                }
+               }
               </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
