@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { collection, collectionData,query,where } from '@angular/fire/firestore';
-import { Product, Slidervalue,ServerProduct } from '../Types/Types';
+import { collection, collectionData, query, where } from '@angular/fire/firestore';
+import { Product, Slidervalue, ServerProduct } from '../Types/Types';
 import { Cart } from './shopping-cart.service';
 import {
   BehaviorSubject,
@@ -202,5 +202,5 @@ export class ProductService {
     this.removeChipsAction$.pipe(map(this.removeChipsHandler))
   ).pipe(scan((acc: string[], stateHandler) => stateHandler(acc), []));
 
-  constructor() {}
+  constructor() { }
 }
